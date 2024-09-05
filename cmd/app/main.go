@@ -3,15 +3,16 @@ package main
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
+	api "github.com/Andhika-GIT/wild_oasis_be/internal/api/handlers"
+	"github.com/Andhika-GIT/wild_oasis_be/internal/infrastructure/config"
 )
 
 
 func main(){
-	r := chi.NewRouter()
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello world"))
-	})
+	v := config.NewViper()
+	l := config.NewLogger()
+	config.NewDatabase(v, &l)
+	r:= api.NewRouter()
 
 	http.ListenAndServe(":3000", r)
 }

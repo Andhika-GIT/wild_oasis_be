@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS bookings (
     totalPrice FLOAT4,
     status VARCHAR(255),
     hasBreakfast BOOL,
-    isPaid BOOL
-    observations VARCHAR(255)
+    isPaid BOOL,
+    observations VARCHAR(255),
     CONSTRAINT fk_cabin
         FOREIGN KEY (cabinId) REFERENCES cabins(id)
         ON DELETE CASCADE,
