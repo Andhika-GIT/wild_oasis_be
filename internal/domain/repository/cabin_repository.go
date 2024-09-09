@@ -10,7 +10,7 @@ import (
 type CabinRepository struct{}
 
 func (r *CabinRepository) Create(c context.Context, tx *gorm.DB, cabin entities.Cabin) error {
-	err := tx.Create(cabin).Error
+	err := tx.Create(&cabin).Error
 	if err != nil {
 		return err
 	}

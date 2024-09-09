@@ -1,0 +1,66 @@
+[
+  {
+    "name": "Cabin 1",
+    "max_capacity": 4,
+    "regular_price": 100,
+    "discount": 10,
+    "description": "Beautiful cabin 1",
+    "image": "image1.jpg"
+  },
+  {
+    "name": "Cabin 2",
+    "max_capacity": 6,
+    "regular_price": 150,
+    "discount": 15,
+    "description": "Beautiful cabin 2",
+    "image": "image2.jpg"
+  },
+  {
+    "name": "Cabin 3",
+    "max_capacity": 5,
+    "regular_price": 120,
+    "discount": 12,
+    "description": "Beautiful cabin 3",
+    "image": "image3.jpg"
+  },
+  {
+    "name": "Cabin 4",
+    "max_capacity": 8,
+    "regular_price": 200,
+    "discount": 20,
+    "description": "Beautiful cabin 4",
+    "image": "image4.jpg"
+  },
+  {
+    "name": "Cabin 5",
+    "max_capacity": 3,
+    "regular_price": 90,
+    "discount": 9,
+    "description": "Beautiful cabin 5",
+    "image": "image5.jpg"
+  },
+  {
+    "name": "Cabin 6",
+    "max_capacity": 7,
+    "regular_price": 170,
+    "discount": 17,
+    "description": "Beautiful cabin 6",
+    "image": "image6.jpg"
+  },
+  {
+    "name": "Cabin 7",
+    "max_capacity": 2,
+    "regular_price": 80,
+    "discount": 8,
+    "description": "Beautiful cabin 7",
+    "image": "image7.jpg"
+  },
+  {
+    "name": "Cabin 8",
+    "max_capacity": 5,
+    "regular_price": 110,
+    "discount": 11,
+    "description": "Beautiful cabin 8",
+    "image": "image8.jpg"
+  }
+]
