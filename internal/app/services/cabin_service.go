@@ -23,6 +23,34 @@ func NewCabinService(repository *repository.CabinRepository, DB *gorm.DB) *Cabin
 	}
 }
 
+func (s *CabinService) FindAll(c context.Context) ([]web.CabinResponse, error) {
+	var cabins []entities.Cabin
+
+	tx := s.DB.WithContext(c).Begin()
+
+	// rollback after all function done
+	defer tx.Rollback()
+
+	err := s.repository.FindAll(c, tx, &cabins)
+
+	if err != nil {
+		return []web.CabinResponse{}, fmt.Errorf("error find all cabins: %v", err)
+	}
+
+	// format cabins for response
+	cabinResponse := web.ToCabinResponses(cabins)
+
+	return cabinResponse, tx.Commit().Error
+
+}
+
+// func (s *CabinService) CheckImageAssets(c context.Context) error {
+// 	cloud, ctx := cloudinary.NewCloudinary()
+
+// 	res, err := cloudinary.GetAssetInfo(cloud, ctx, "m4cce9hp4oxsafoxapfb")
+
+// }
+
 func (s *CabinService) SeedCabins(c context.Context) error {
 
 	tx := s.DB.WithContext(c).Begin()
@@ -43,7 +71,7 @@ func (s *CabinService) SeedCabins(c context.Context) error {
 	}
 
 	for _, cabin := range cabins {
-		err = s.repository.Create(c, tx, cabin)
+		err = s.repository.Create(c, tx, &cabin)
 
 		if err != nil {
 			return fmt.Errorf("error create cabin : %v", err)
@@ -51,26 +79,5 @@ func (s *CabinService) SeedCabins(c context.Context) error {
 	}
 
 	return tx.Commit().Error
-
-}
-
-func (s *CabinService) FindAll(c context.Context) ([]web.CabinResponse, error) {
-	var cabins []entities.Cabin
-
-	tx := s.DB.WithContext(c).Begin()
-
-	// rollback after all function done
-	defer tx.Rollback()
-
-	err := s.repository.FindAll(c, tx, cabins)
-
-	if err != nil {
-		return []web.CabinResponse{}, fmt.Errorf("error find all cabins: %v", err)
-	}
-
-	// format cabins for response
-	cabinResponse := web.ToCabinResponses(cabins)
-
-	return cabinResponse, tx.Commit().Error
 
 }
