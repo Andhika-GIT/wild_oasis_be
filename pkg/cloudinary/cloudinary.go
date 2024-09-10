@@ -4,17 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Andhika-GIT/wild_oasis_be/internal/infrastructure/config"
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/admin"
 )
 
-func NewCloudinary() (*cloudinary.Cloudinary, context.Context) {
-	v := config.NewViper()
-
-	apiKey := v.GetString("CLOUDINARY_API_KEY")
-	apiSecret := v.GetString("CLOUDINARY_API_SECRET")
-	cloudName := v.GetString("CLOUDINARY_CLOUD_NAME")
+func NewCloudinary(apiKey, apiSecret, cloudName string) (*cloudinary.Cloudinary, context.Context) {
 
 	cld, err := cloudinary.NewFromParams(cloudName, apiKey, apiSecret)
 

@@ -7,19 +7,24 @@ import (
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/web"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/entities"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/repository"
+	"github.com/Andhika-GIT/wild_oasis_be/pkg/cloudinary"
 	"github.com/Andhika-GIT/wild_oasis_be/pkg/file"
+	"github.com/cloudinary/cloudinary-go/v2/api/admin"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
 type CabinService struct {
 	repository *repository.CabinRepository
 	DB         *gorm.DB
+	viper      *viper.Viper
 }
 
-func NewCabinService(repository *repository.CabinRepository, DB *gorm.DB) *CabinService {
+func NewCabinService(repository *repository.CabinRepository, DB *gorm.DB, viper *viper.Viper) *CabinService {
 	return &CabinService{
 		repository: repository,
 		DB:         DB,
+		viper:      viper,
 	}
 }
 
@@ -44,12 +49,22 @@ func (s *CabinService) FindAll(c context.Context) ([]web.CabinResponse, error) {
 
 }
 
-// func (s *CabinService) CheckImageAssets(c context.Context) error {
-// 	cloud, ctx := cloudinary.NewCloudinary()
+func (s *CabinService) CheckImageAssets(c context.Context) (*admin.AssetResult, error) {
+	apiKey := s.viper.GetString("CLOUDINARY_API_KEY")
+	apiSecret := s.viper.GetString("CLOUDINARY_API_SECRET")
+	cloudName := s.viper.GetString("CLOUDINARY_CLOUD_NAME")
 
-// 	res, err := cloudinary.GetAssetInfo(cloud, ctx, "m4cce9hp4oxsafoxapfb")
+	cloud, ctx := cloudinary.NewCloudinary(apiKey, apiSecret, cloudName)
 
-// }
+	res, err := cloudinary.GetAssetInfo(cloud, ctx, "m4cce9hp4oxsafoxapfb")
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+
+}
 
 func (s *CabinService) SeedCabins(c context.Context) error {
 
