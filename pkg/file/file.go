@@ -1,4 +1,4 @@
-package utils
+package file
 
 import (
 	"encoding/json"
@@ -19,7 +19,7 @@ func LoadFromJsonFile[T any](filepath string) (T, error) {
 
 	decoder := json.NewDecoder(jsonFile)
 
-	err = decoder.Decode(data)
+	err = decoder.Decode(&data)
 
 	if err != nil {
 		return data, fmt.Errorf("failed to decode json : %v", err)
