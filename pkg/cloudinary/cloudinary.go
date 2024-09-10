@@ -6,6 +6,7 @@ import (
 
 	"github.com/Andhika-GIT/wild_oasis_be/internal/infrastructure/config"
 	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/admin"
 )
 
 func NewCloudinary() (*cloudinary.Cloudinary, context.Context) {
@@ -22,4 +23,14 @@ func NewCloudinary() (*cloudinary.Cloudinary, context.Context) {
 	}
 
 	return cld, context.Background()
+}
+
+func GetAssetInfo(cld *cloudinary.Cloudinary, c context.Context, publicID string) (*admin.AssetResult, error) {
+	res, err := cld.Admin.Asset(c, admin.AssetParams{PublicID: publicID})
+
+	if err != nil {
+		return nil, fmt.Errorf("error getting assets")
+	}
+
+	return res, nil
 }
