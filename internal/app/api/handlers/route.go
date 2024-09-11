@@ -7,15 +7,17 @@ import (
 )
 
 type Router struct {
-	route        *chi.Mux
-	CabinHandler *CabinHandler
+	route             *chi.Mux
+	CabinHandler      *CabinHandler
+	CloudinaryHandler *CloudinaryHandler
 }
 
-func NewRouter(cabinHandler *CabinHandler) *Router {
+func NewRouter(cabinHandler *CabinHandler, cloudinaryHandler *CloudinaryHandler) *Router {
 
 	r := &Router{
-		route:        chi.NewMux(),
-		CabinHandler: cabinHandler,
+		route:             chi.NewMux(),
+		CabinHandler:      cabinHandler,
+		CloudinaryHandler: cloudinaryHandler,
 	}
 
 	r.SetupRoute()
@@ -31,6 +33,11 @@ func (r *Router) SetupRoute() {
 			w.Write([]byte("Hello from /api"))
 		})
 
+		// cloudinary
+		api.Get("/cloudinary/image-asset", r.CloudinaryHandler.CheckImageAssets)
+		api.Get("/cloudinary/get-URL", r.CloudinaryHandler.GetImagePublicUrl)
+
+		// cabins
 		api.Get("/cabins", r.CabinHandler.FindAllCabins)
 		api.Post("/cabins/seeds", r.CabinHandler.SeedsCabins)
 

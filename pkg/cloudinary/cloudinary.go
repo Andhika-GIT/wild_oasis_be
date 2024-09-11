@@ -8,15 +8,15 @@ import (
 	"github.com/cloudinary/cloudinary-go/v2/api/admin"
 )
 
-func NewCloudinary(apiKey, apiSecret, cloudName string) (*cloudinary.Cloudinary, context.Context) {
+func NewCloudinary(apiKey, apiSecret, cloudName string) (*cloudinary.Cloudinary, context.Context, error) {
 
 	cld, err := cloudinary.NewFromParams(cloudName, apiKey, apiSecret)
 
 	if err != nil {
-		fmt.Println("cloudinary setup failed", err)
+		return &cloudinary.Cloudinary{}, context.Background(), fmt.Errorf("failed to setup cloudinary")
 	}
 
-	return cld, context.Background()
+	return cld, context.Background(), nil
 }
 
 func GetAssetInfo(cld *cloudinary.Cloudinary, c context.Context, publicID string) (*admin.AssetResult, error) {

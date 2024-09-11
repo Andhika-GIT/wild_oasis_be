@@ -42,7 +42,7 @@ func (c *CabinHandler) FindAllCabins(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 
-		utils.SendResponse(w, web.Response{
+		utils.SendResponse(w, web.ErrorResponse{
 			Code:    500,
 			Message: fmt.Sprintf("error, %s", err),
 		})
