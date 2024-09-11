@@ -23,7 +23,7 @@ func (c *CabinHandler) SeedsCabins(w http.ResponseWriter, r *http.Request) {
 	err := c.service.SeedCabins(r.Context())
 
 	if err != nil {
-		utils.SendResponse(w, web.Response{
+		utils.SendResponse(w, 500, web.Response{
 			Code:    500,
 			Message: fmt.Sprintf("error, %s", err),
 		})
@@ -31,7 +31,7 @@ func (c *CabinHandler) SeedsCabins(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.SendResponse(w, web.Response{
+	utils.SendResponse(w, 200, web.Response{
 		Code:    200,
 		Message: "Successfully seeds cabins",
 	})
@@ -42,7 +42,7 @@ func (c *CabinHandler) FindAllCabins(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 
-		utils.SendResponse(w, web.ErrorResponse{
+		utils.SendResponse(w, 500, web.ErrorResponse{
 			Code:    500,
 			Message: fmt.Sprintf("error, %s", err),
 		})
@@ -50,7 +50,7 @@ func (c *CabinHandler) FindAllCabins(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.SendResponse(w, web.Response{
+	utils.SendResponse(w, 200, web.Response{
 		Code:    200,
 		Message: "Successfully get all cabins",
 		Data:    cabinResponse,

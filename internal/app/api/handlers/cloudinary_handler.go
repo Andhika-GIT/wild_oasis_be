@@ -23,7 +23,7 @@ func (c *CloudinaryHandler) CheckImageAssets(w http.ResponseWriter, r *http.Requ
 	publicID := r.URL.Query().Get("publicID")
 
 	if publicID == "" {
-		utils.SendResponse(w, web.ErrorResponse{
+		utils.SendResponse(w, 400, web.ErrorResponse{
 			Code:    400,
 			Message: "publicID is required",
 		})
@@ -33,15 +33,15 @@ func (c *CloudinaryHandler) CheckImageAssets(w http.ResponseWriter, r *http.Requ
 	res, err := c.service.CheckImageAssets(r.Context(), publicID)
 
 	if err != nil {
-		utils.SendResponse(w, web.ErrorResponse{
-			Code:    500,
+		utils.SendResponse(w, 400, web.ErrorResponse{
+			Code:    400,
 			Message: fmt.Sprintf("error, %s", err),
 		})
 
 		return
 	}
 
-	utils.SendResponse(w, web.Response{
+	utils.SendResponse(w, 200, web.Response{
 		Code:    200,
 		Message: "Sucessfully get image asset",
 		Data:    res,
@@ -52,7 +52,7 @@ func (c *CloudinaryHandler) GetImagePublicUrl(w http.ResponseWriter, r *http.Req
 	publicID := r.URL.Query().Get("publicID")
 
 	if publicID == "" {
-		utils.SendResponse(w, web.ErrorResponse{
+		utils.SendResponse(w, 400, web.ErrorResponse{
 			Code:    400,
 			Message: "publicID is required",
 		})
@@ -62,15 +62,15 @@ func (c *CloudinaryHandler) GetImagePublicUrl(w http.ResponseWriter, r *http.Req
 	imageURL, err := c.service.GetImagePublicUrl(r.Context(), publicID)
 
 	if err != nil {
-		utils.SendResponse(w, web.ErrorResponse{
-			Code:    500,
+		utils.SendResponse(w, 400, web.ErrorResponse{
+			Code:    400,
 			Message: fmt.Sprintf("error, %s", err),
 		})
 
 		return
 	}
 
-	utils.SendResponse(w, web.Response{
+	utils.SendResponse(w, 200, web.Response{
 		Code:    200,
 		Message: "Sucessfully get image URL",
 		Data:    imageURL,
