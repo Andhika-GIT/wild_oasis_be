@@ -12,14 +12,16 @@ import (
 )
 
 type CabinService struct {
-	repository *repository.CabinRepository
-	DB         *gorm.DB
+	repository        *repository.CabinRepository
+	cloudinaryService *CloudinaryService
+	DB                *gorm.DB
 }
 
-func NewCabinService(repository *repository.CabinRepository, DB *gorm.DB) *CabinService {
+func NewCabinService(repository *repository.CabinRepository, DB *gorm.DB, cloudinaryService *CloudinaryService) *CabinService {
 	return &CabinService{
-		repository: repository,
-		DB:         DB,
+		repository:        repository,
+		cloudinaryService: cloudinaryService,
+		DB:                DB,
 	}
 }
 

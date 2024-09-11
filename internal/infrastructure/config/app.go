@@ -16,8 +16,8 @@ func Bootstrap() *chi.Mux {
 	cabinRepository := repository.CabinRepository{}
 
 	// services
-	cabinService := services.NewCabinService(&cabinRepository, db)
 	cloudinaryService := services.NewCloudinaryService(v)
+	cabinService := services.NewCabinService(&cabinRepository, db, cloudinaryService)
 
 	// handlers
 	cabinHandler := handlers.NewCabinHandler(cabinService)
