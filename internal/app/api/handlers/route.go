@@ -40,6 +40,7 @@ func (r *Router) SetupRoute() {
 		// cabins
 		api.Get("/cabins", r.CabinHandler.FindAllCabins)
 		api.Post("/cabins/seeds", r.CabinHandler.SeedsCabins)
+		api.Get("/cabins/{cabinId}", r.CabinHandler.FindCabinById)
 
 	})
 

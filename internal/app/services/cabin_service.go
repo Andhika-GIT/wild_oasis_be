@@ -46,6 +46,24 @@ func (s *CabinService) FindAll(c context.Context) ([]web.CabinResponse, error) {
 
 }
 
+func (s *CabinService) FindById(c context.Context, id int) (web.CabinResponse, error) {
+	var cabin entities.Cabin
+
+	tx := s.DB.WithContext(c).Begin()
+
+	defer tx.Rollback()
+
+	err := s.repository.FindById(c, tx, id, &cabin)
+
+	if err != nil {
+		return web.CabinResponse{}, fmt.Errorf("error find cabin: %v", err)
+	}
+
+	cabinResponse := web.ToCabinResponse(cabin)
+
+	return cabinResponse, tx.Commit().Error
+}
+
 func (s *CabinService) SeedCabins(c context.Context) error {
 
 	tx := s.DB.WithContext(c).Begin()
