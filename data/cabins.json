@@ -1,0 +1,66 @@
+[
+  {
+    "name": "Serenity Haven",
+    "max_capacity": 4,
+    "regular_price": 100,
+    "discount": 10,
+    "description": "A cozy, tranquil escape surrounded by nature, perfect for a peaceful retreat.",
+    "image": "https://res.cloudinary.com/dvwhhtfpz/image/upload/v1725629840/wild-oasis/cabin-images/m4cce9hp4oxsafoxapfb.jpg"
+  },
+  {
+    "name": "Summit Lodge",
+    "max_capacity": 6,
+    "regular_price": 150,
+    "discount": 15,
+    "description": "An expansive cabin offering breathtaking views and ample space for families or groups.",
+    "image": "https://res.cloudinary.com/dvwhhtfpz/image/upload/v1725629838/wild-oasis/cabin-images/giuwmsveecsvk2yaauk1.jpg"
+  },
+  {
+    "name": "Whispering Pines",
+    "max_capacity": 5,
+    "regular_price": 120,
+    "discount": 12,
+    "description": "Nestled among tall trees, this cabin provides a serene setting for a nature-filled getaway.",
+    "image": "https://res.cloudinary.com/dvwhhtfpz/image/upload/v1725629837/wild-oasis/cabin-images/wdwdyfira2yvtlh1xvcs.jpg"
+  },
+  {
+    "name": "Mountain Crest",
+    "max_capacity": 8,
+    "regular_price": 200,
+    "discount": 20,
+    "description": "A spacious, luxurious retreat with stunning mountain views and modern amenities.",
+    "image": "https://res.cloudinary.com/dvwhhtfpz/image/upload/v1725629824/wild-oasis/cabin-images/cjc64lbfbvqibcs6jd5q.jpg"
+  },
+  {
+    "name": "Tranquil Waters",
+    "max_capacity": 3,
+    "regular_price": 90,
+    "discount": 9,
+    "description": "A charming and intimate cabin with serene views of a nearby lake.",
+    "image": "https://res.cloudinary.com/dvwhhtfpz/image/upload/v1725629824/wild-oasis/cabin-images/lu04fujrapehcn2r0pac.jpg"
+  },
+  {
+    "name": "Woodland Retreat",
+    "max_capacity": 7,
+    "regular_price": 170,
+    "discount": 17,
+    "description": "A beautiful retreat nestled in the forest, ideal for larger groups seeking adventure.",
+    "image": "https://res.cloudinary.com/dvwhhtfpz/image/upload/v1725629824/wild-oasis/cabin-images/pkjfxg4yzcttjn6s4jy4.jpg"
+  },
+  {
+    "name": "The Cozy Nook",
+    "max_capacity": 2,
+    "regular_price": 80,
+    "discount": 8,
+    "description": "A snug cabin perfect for couples or solo travelers, offering privacy and charm.",
+    "image": "https://res.cloudinary.com/dvwhhtfpz/image/upload/v1725629824/wild-oasis/cabin-images/zwuuf56fxj06mh2owpip.jpg"
+  },
+  {
+    "name": "Forest Glen",
+    "max_capacity": 5,
+    "regular_price": 110,
+    "discount": 11,
+    "description": "An enchanting cabin located deep in the woods, offering a secluded experience.",
+    "image": "https://res.cloudinary.com/dvwhhtfpz/image/upload/v1725629824/wild-oasis/cabin-images/vofeyzlgegujdunvjzzs.jpg"
+  }
+]
