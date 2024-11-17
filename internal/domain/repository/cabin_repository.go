@@ -25,6 +25,16 @@ func (r *CabinRepository) FindAll(c context.Context, tx *gorm.DB, cabins *[]enti
 	return nil
 }
 
+func (r *CabinRepository) FindAllByCapasity(c context.Context, tx *gorm.DB, max_capacity int, cabins *[]entities.Cabin) error {
+	err := tx.Where("max_capacity <= ?", max_capacity).Find(&cabins).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *CabinRepository) FindById(c context.Context, tx *gorm.DB, cabinId int, cabin *entities.Cabin) error {
 	err := tx.Where("id = ?", cabinId).First(&cabin).Error
 	if err != nil {

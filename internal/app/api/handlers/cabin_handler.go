@@ -40,7 +40,30 @@ func (c *CabinHandler) SeedsCabins(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *CabinHandler) FindAllCabins(w http.ResponseWriter, r *http.Request) {
-	cabinResponse, err := c.service.FindAll(r.Context())
+
+	var cabinResponse []web.CabinResponse
+	var err error
+	maxCapacityParam := r.URL.Query().Get("max_capacity")
+
+	maxCapacity := 0 // default
+
+	// if max_capacity param is not null
+	if maxCapacityParam != "" {
+
+		parsed, err := strconv.Atoi(maxCapacityParam)
+		if err != nil {
+			utils.SendResponse(w, http.StatusBadRequest, web.ErrorResponse{
+				Code:    http.StatusBadRequest,
+				Message: "Invalid max_capacity value",
+			})
+			return
+		}
+
+		// assign the max_capacity param
+		maxCapacity = parsed
+	}
+
+	cabinResponse, err = c.service.FindAll(r.Context(), maxCapacity)
 
 	if err != nil {
 
