@@ -88,6 +88,11 @@ func (s *CabinService) SeedCabins(c context.Context) error {
 		return fmt.Errorf("error when deleting all cabins : %v", err)
 	}
 
+	err = tx.Exec("TRUNCATE TABLE cabins RESTART IDENTITY CASCADE").Error
+	if err != nil {
+		return fmt.Errorf("error when truncating table: %v", err)
+	}
+
 	for _, cabin := range cabins {
 		err = s.repository.Create(c, tx, &cabin)
 
