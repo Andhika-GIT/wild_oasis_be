@@ -7,23 +7,38 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func Bootstrap() *chi.Mux {
+type AppConfig struct {
+	Router            *chi.Mux
+	CabinService      *services.CabinService
+	BookingService    *services.BookingService
+	CloudinaryService *services.CloudinaryService
+}
+
+func Bootstrap() *AppConfig {
 	v := NewViper()
 	l := NewLogger()
 	db := NewDatabase(v, &l)
 
 	// repository
 	cabinRepository := repository.CabinRepository{}
+	bookingRepository := repository.BookingRepository{}
 
 	// services
 	cloudinaryService := services.NewCloudinaryService(v)
 	cabinService := services.NewCabinService(&cabinRepository, db, cloudinaryService)
+	bookingService := services.NewBookingService(&bookingRepository, db)
 
 	// handlers
 	cabinHandler := handlers.NewCabinHandler(cabinService)
+	bookingHandler := handlers.NewBookingHandler(bookingService, cabinService)
 	cloudinaryHandler := handlers.NewCloudinaryHandler(cloudinaryService)
 
-	router := handlers.NewRouter(cabinHandler, cloudinaryHandler)
+	router := handlers.NewRouter(cabinHandler, bookingHandler, cloudinaryHandler)
 
-	return router.GetRouter()
+	return &AppConfig{
+		Router:            router.GetRouter(),
+		CabinService:      cabinService,
+		BookingService:    bookingService,
+		CloudinaryService: cloudinaryService,
+	}
 }
