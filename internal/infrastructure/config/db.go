@@ -5,15 +5,16 @@ import (
 	"log"
 	"time"
 
+	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/entities"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-func NewDatabase(viper *viper.Viper, logger *logger.Interface) *gorm.DB{
+func NewDatabase(viper *viper.Viper, logger *logger.Interface) *gorm.DB {
 	DB_USERNAME := viper.GetString("DB_USERNAME")
-	DB_PASSWORD:= viper.GetString("DB_PASSWORD")
+	DB_PASSWORD := viper.GetString("DB_PASSWORD")
 	DB_HOST := viper.GetString("DB_HOST")
 	DB_PORT := viper.GetString("DB_PORT")
 	DB_NAME := viper.GetString("DB_NAME")
@@ -41,6 +42,17 @@ func NewDatabase(viper *viper.Viper, logger *logger.Interface) *gorm.DB{
 	connection.SetMaxIdleConns(DB_IDLE_CONNECTION)
 	connection.SetMaxOpenConns(DB_MAX_CONNECTION)
 	connection.SetConnMaxLifetime(time.Second * time.Duration(DB_MAX_LIFE_TIME))
+
+	err = db.AutoMigrate(
+		&entities.Booking{},
+		&entities.Cabin{},
+		&entities.Guest{},
+		&entities.Settings{},
+	)
+
+	if err != nil {
+		log.Fatalf("failed to migrate database: %v", err)
+	}
 
 	return db
 }

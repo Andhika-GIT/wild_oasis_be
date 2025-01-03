@@ -8,6 +8,7 @@ import (
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/web"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/entities"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/repository"
+	"github.com/Andhika-GIT/wild_oasis_be/pkg/file"
 	"gorm.io/gorm"
 )
 
@@ -42,4 +43,45 @@ func (s *BookingService) GetBookedDatesByCabinId(c context.Context, cabinId int)
 	bookingResponses := web.ToBookingResponses(bookings)
 
 	return bookingResponses, tx.Commit().Error
+}
+
+func (s *BookingService) SeedBookings(c context.Context) error {
+
+	tx := s.DB.WithContext(c).Begin()
+
+	// rollback after all function done
+	defer tx.Rollback()
+
+	// read file from json
+	bookings, err := file.LoadFromJsonFile[[]entities.Booking]("./data/bookings.json")
+	if err != nil {
+		return fmt.Errorf("error %v", err)
+	}
+
+	fmt.Println("Bookings loaded from JSON:")
+	for _, booking := range bookings {
+		fmt.Printf("Booking: %+v\n", booking)
+	}
+
+	//  reset all data first first
+	err = tx.Exec("DELETE from bookings").Error
+	if err != nil {
+		return fmt.Errorf("error when deleting all bookings : %v", err)
+	}
+
+	err = tx.Exec("TRUNCATE TABLE bookings RESTART IDENTITY CASCADE").Error
+	if err != nil {
+		return fmt.Errorf("error when truncating table: %v", err)
+	}
+
+	for _, booking := range bookings {
+		err = s.repository.Create(c, tx, &booking)
+
+		if err != nil {
+			return fmt.Errorf("error create booking : %v", err)
+		}
+	}
+
+	return tx.Commit().Error
+
 }
