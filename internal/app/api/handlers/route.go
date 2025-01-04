@@ -10,15 +10,17 @@ type Router struct {
 	route             *chi.Mux
 	CabinHandler      *CabinHandler
 	BookingHandler    *BookingHandler
+	SettingHandler    *SettingHandler
 	CloudinaryHandler *CloudinaryHandler
 }
 
-func NewRouter(cabinHandler *CabinHandler, bookingHandler *BookingHandler, cloudinaryHandler *CloudinaryHandler) *Router {
+func NewRouter(cabinHandler *CabinHandler, bookingHandler *BookingHandler, settingHandler *SettingHandler, cloudinaryHandler *CloudinaryHandler) *Router {
 
 	r := &Router{
 		route:             chi.NewMux(),
 		CabinHandler:      cabinHandler,
 		BookingHandler:    bookingHandler,
+		SettingHandler:    settingHandler,
 		CloudinaryHandler: cloudinaryHandler,
 	}
 
@@ -43,8 +45,11 @@ func (r *Router) SetupRoute() {
 		api.Get("/cabins", r.CabinHandler.FindAllCabins)
 		api.Get("/cabins/{cabinId}", r.CabinHandler.FindCabinById)
 
-		//booking
+		// bookings
 		api.Get("/booking/find-booked-dates-by-cabin/{cabinId}", r.BookingHandler.GetBookedDatesByCabinId)
+
+		// settings
+		api.Get("/setting", r.SettingHandler.GetSetting)
 
 	})
 

@@ -24,5 +24,11 @@ func main() {
 		log.Fatal("error while seeding: %v", err)
 	}
 
+	err = app.SettingService.SeedSetting(context.Background())
+
+	if err != nil {
+		log.Fatal("error while seeding: %v", err)
+	}
+
 	log.Println("Seeding completed")
 }
