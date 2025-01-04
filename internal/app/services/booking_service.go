@@ -8,6 +8,7 @@ import (
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/web"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/entities"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/repository"
+	"github.com/Andhika-GIT/wild_oasis_be/pkg/date"
 	"github.com/Andhika-GIT/wild_oasis_be/pkg/file"
 	"gorm.io/gorm"
 )
@@ -24,25 +25,39 @@ func NewBookingService(repository *repository.BookingRepository, DB *gorm.DB) *B
 	}
 }
 
-func (s *BookingService) GetBookedDatesByCabinId(c context.Context, cabinId int) ([]web.BookingResponse, error) {
+func (s *BookingService) GetBookedDatesByCabinId(c context.Context, cabinId int) ([]string, error) {
 	var bookings []entities.Booking
+	var bookingDates [][]string
+	var formattedDates []string
 
 	tx := s.DB.WithContext(c).Begin()
 	defer tx.Rollback()
 
-	now := time.Now().UTC()
-	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
-	todayStr := today.Format(time.RFC3339) // ex Output: "2025-01-02T00:00:00Z"
+	now := time.Now().UTC()                                                      // ex output : 2025-01-02T14:23:45Z
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC) // ex output : 2025-01-02 00:00:00 +0000 UTC
+	// todayStr := today.Format(time.RFC3339) // ex Output: "2025-01-02T00:00:00Z"
 
-	err := s.repository.FindBookedDatesByCabinId(c, todayStr, tx, cabinId, &bookings)
+	err := s.repository.FindBookedDatesByCabinId(c, today, tx, cabinId, &bookings)
 
 	if err != nil {
-		return []web.BookingResponse{}, fmt.Errorf("error while find bookings : %v", err)
+		return []string{}, fmt.Errorf("error while find bookings : %v", err)
 	}
 
 	bookingResponses := web.ToBookingResponses(bookings)
 
-	return bookingResponses, tx.Commit().Error
+	for _, booking := range bookingResponses {
+		bookingDates = append(bookingDates, date.EachDayOfInterval(booking.StartDate, booking.EndDate))
+	}
+
+	fmt.Println("---- INI ADALAH BOOKING DATE ----")
+	for _, bookingDate := range bookingDates {
+		for _, date := range bookingDate {
+			formattedDates = append(formattedDates, date)
+		}
+	}
+
+	return formattedDates, nil
+
 }
 
 func (s *BookingService) SeedBookings(c context.Context) error {
