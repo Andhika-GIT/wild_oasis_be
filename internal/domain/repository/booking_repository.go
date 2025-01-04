@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/entities"
 	"gorm.io/gorm"
@@ -29,8 +30,9 @@ func (r *BookingRepository) FindAll(c context.Context, tx *gorm.DB, bookings *[]
 	return nil
 }
 
-func (r *BookingRepository) FindBookedDatesByCabinId(c context.Context, bookingDate string, tx *gorm.DB, cabinId int, bookings *[]entities.Booking) error {
-	err := tx.Where("id = ?", cabinId).Where("start_date >= ?", bookingDate).Or("status = ?", "checked-in").Find(&bookings).Error
+func (r *BookingRepository) FindBookedDatesByCabinId(c context.Context, bookingDate time.Time, tx *gorm.DB, cabinId int, bookings *[]entities.Booking) error {
+	err := tx.Where("cabin_id = ? AND (start_date >= ? OR status = ?)", cabinId, bookingDate, "checked-in").
+		Find(&bookings).Error
 
 	if err != nil {
 		return err
