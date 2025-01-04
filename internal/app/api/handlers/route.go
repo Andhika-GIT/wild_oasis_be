@@ -46,7 +46,7 @@ func (r *Router) SetupRoute() {
 		api.Get("/cabins/{cabinId}", r.CabinHandler.FindCabinById)
 
 		// bookings
-		api.Get("/booking/find-booked-dates-by-cabin/{cabinId}", r.BookingHandler.GetBookedDatesByCabinId)
+		api.Get("/booking/booked-dates/cabin/{cabinId}", r.BookingHandler.GetBookedDatesByCabinId)
 
 		// settings
 		api.Get("/setting", r.SettingHandler.GetSetting)
