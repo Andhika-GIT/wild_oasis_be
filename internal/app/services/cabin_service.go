@@ -25,15 +25,20 @@ func NewCabinService(repository *repository.CabinRepository, DB *gorm.DB, cloudi
 	}
 }
 
-func (s *CabinService) FindAll(c context.Context) ([]web.CabinResponse, error) {
+func (s *CabinService) FindAll(c context.Context, maxCapacity int) ([]web.CabinResponse, error) {
 	var cabins []entities.Cabin
+	var err error
 
 	tx := s.DB.WithContext(c).Begin()
 
 	// rollback after all function done
 	defer tx.Rollback()
 
-	err := s.repository.FindAll(c, tx, &cabins)
+	if maxCapacity == 0 {
+		err = s.repository.FindAll(c, tx, &cabins)
+	} else {
+		err = s.repository.FindAllByCapasity(c, tx, maxCapacity, &cabins)
+	}
 
 	if err != nil {
 		return []web.CabinResponse{}, fmt.Errorf("error find all cabins: %v", err)
@@ -81,6 +86,11 @@ func (s *CabinService) SeedCabins(c context.Context) error {
 	err = tx.Exec("DELETE from cabins").Error
 	if err != nil {
 		return fmt.Errorf("error when deleting all cabins : %v", err)
+	}
+
+	err = tx.Exec("TRUNCATE TABLE cabins RESTART IDENTITY CASCADE").Error
+	if err != nil {
+		return fmt.Errorf("error when truncating table: %v", err)
 	}
 
 	for _, cabin := range cabins {

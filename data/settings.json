@@ -1,0 +1,8 @@
+[
+  {
+    "min_booking_length": 1,
+    "max_booking_length": 30,
+    "max_guests_per_cabin": 6,
+    "breakfast_price": 15.5
+  }
+]

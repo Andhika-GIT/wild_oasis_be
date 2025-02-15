@@ -8,7 +8,8 @@ import (
 
 func main() {
 
-	r := config.Bootstrap()
+	app := config.Bootstrap()
 
-	http.ListenAndServe(":3000", r)
+	http.ListenAndServe(":3000", app.Router)
+
 }
