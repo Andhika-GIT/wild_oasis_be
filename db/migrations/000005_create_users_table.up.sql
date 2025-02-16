@@ -3,5 +3,8 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-
+    guest_id INT,
+    CONSTRAINT fk_user
+        FOREIGN KEY(guest_id) REFERENCES users(id)
+        ON DELETE CASCADE
 );
