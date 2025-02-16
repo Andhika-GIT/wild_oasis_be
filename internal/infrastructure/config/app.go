@@ -5,6 +5,7 @@ import (
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/services"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/repository"
 	"github.com/go-chi/chi/v5"
+	"github.com/spf13/viper"
 )
 
 type AppConfig struct {
@@ -13,6 +14,7 @@ type AppConfig struct {
 	BookingService    *services.BookingService
 	SettingService    *services.SettingService
 	CloudinaryService *services.CloudinaryService
+	Global            *viper.Viper
 }
 
 func Bootstrap() *AppConfig {
@@ -45,5 +47,6 @@ func Bootstrap() *AppConfig {
 		BookingService:    bookingService,
 		SettingService:    settingService,
 		CloudinaryService: cloudinaryService,
+		Global:            v,
 	}
 }
