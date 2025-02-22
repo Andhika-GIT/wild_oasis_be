@@ -12,9 +12,10 @@ type Router struct {
 	BookingHandler    *BookingHandler
 	SettingHandler    *SettingHandler
 	CloudinaryHandler *CloudinaryHandler
+	AuthHandler       *AuthHandler
 }
 
-func NewRouter(cabinHandler *CabinHandler, bookingHandler *BookingHandler, settingHandler *SettingHandler, cloudinaryHandler *CloudinaryHandler) *Router {
+func NewRouter(cabinHandler *CabinHandler, bookingHandler *BookingHandler, settingHandler *SettingHandler, cloudinaryHandler *CloudinaryHandler, AuthHandler *AuthHandler) *Router {
 
 	r := &Router{
 		route:             chi.NewMux(),
@@ -22,6 +23,7 @@ func NewRouter(cabinHandler *CabinHandler, bookingHandler *BookingHandler, setti
 		BookingHandler:    bookingHandler,
 		SettingHandler:    settingHandler,
 		CloudinaryHandler: cloudinaryHandler,
+		AuthHandler:       AuthHandler,
 	}
 
 	r.SetupRoute()
@@ -50,6 +52,9 @@ func (r *Router) SetupRoute() {
 
 		// settings
 		api.Get("/setting", r.SettingHandler.GetSetting)
+
+		// auth
+		api.Post("/auth/sign-up", r.AuthHandler.SignUp)
 
 	})
 
