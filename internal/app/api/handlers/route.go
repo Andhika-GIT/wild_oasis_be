@@ -54,6 +54,7 @@ func (r *Router) SetupRoute() {
 		api.Get("/setting", r.SettingHandler.GetSetting)
 
 		// auth
+		api.Post("/auth/sign-in", r.AuthHandler.SignIn)
 		api.Post("/auth/sign-up", r.AuthHandler.SignUp)
 
 	})

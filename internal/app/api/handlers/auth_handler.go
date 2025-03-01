@@ -18,6 +18,37 @@ func NewAuthHandler(service *services.AuthService) *AuthHandler {
 	}
 }
 
+func (c *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
+	bodyRequest := &web.VerifyUser{}
+
+	utils.ReadBodyRequest(r, bodyRequest)
+
+	if bodyRequest.Email == "" || bodyRequest.Password == "" {
+		utils.SendResponse(w, http.StatusBadRequest, web.ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: "All fields are required",
+		})
+		return
+	}
+
+	err := c.service.VerifyUser(r.Context(), *bodyRequest)
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusBadRequest, web.ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	utils.SendResponse(w, http.StatusOK, web.Response{
+		Code:    http.StatusOK,
+		Message: "Successfully login",
+		Data:    "",
+	})
+
+}
+
 func (c *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	bodyRequest := &web.CreateUser{}
 

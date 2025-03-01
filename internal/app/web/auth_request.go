@@ -5,3 +5,8 @@ type CreateUser struct {
 	Email    string `validate:"required" json:"email"`
 	Password string `validate:"required" json:"password"`
 }
+
+type VerifyUser struct {
+	Email    string `validate:"required" json:"email"`
+	Password string `validate:"required" json:"password"`
+}

@@ -33,6 +33,12 @@ func HashPassword(stringPassword string) (string, error) {
 	return string(hashedBytes), nil
 }
 
+func checkPassword(hashedPassword, inputPassword string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(inputPassword))
+
+	return err == nil
+}
+
 func (s *AuthService) UserEmailExist(c context.Context, userEmail string) bool {
 	var user entities.User
 	tx := s.DB.WithContext(c).Begin()
@@ -46,6 +52,35 @@ func (s *AuthService) UserEmailExist(c context.Context, userEmail string) bool {
 	}
 
 	return true
+}
+
+func (s *AuthService) VerifyUser(c context.Context, inputUser web.VerifyUser) error {
+
+	isEmailExist := s.UserEmailExist(c, inputUser.Email)
+
+	if !isEmailExist {
+		return fmt.Errorf("wrong credentials")
+	}
+
+	var user entities.User
+
+	tx := s.DB.WithContext(c).Begin()
+
+	defer tx.Rollback()
+
+	err := s.repository.FindByEmail(c, tx, inputUser.Email, &user)
+
+	if err != nil {
+		return fmt.Errorf("something went wrong")
+	}
+
+	isPasswordCorrent := checkPassword(user.Password, inputUser.Password)
+
+	if !isPasswordCorrent {
+		return fmt.Errorf("wrong credentials")
+	}
+
+	return nil
 }
 
 func (s *AuthService) CreateNewUser(c context.Context, userData web.CreateUser) error {
