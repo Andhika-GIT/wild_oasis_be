@@ -7,6 +7,8 @@ import (
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/web"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/entities"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/repository"
+	"github.com/go-chi/jwtauth/v5"
+	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -14,12 +16,14 @@ import (
 type AuthService struct {
 	repository *repository.UserRepository
 	DB         *gorm.DB
+	env        *viper.Viper
 }
 
-func NewAuthService(repository *repository.UserRepository, DB *gorm.DB) *AuthService {
+func NewAuthService(repository *repository.UserRepository, DB *gorm.DB, viper *viper.Viper) *AuthService {
 	return &AuthService{
 		repository: repository,
 		DB:         DB,
+		env:        viper,
 	}
 }
 
@@ -39,6 +43,18 @@ func checkPassword(hashedPassword, inputPassword string) bool {
 	return err == nil
 }
 
+func (s *AuthService) GenerateJwtToken(userId int) (string, error) {
+	var tokenAuth = jwtauth.New("HS256", []byte(s.env.GetString("JWT_SECRET")), nil)
+
+	_, tokenJwtString, err := tokenAuth.Encode(map[string]interface{}{"user_id": userId})
+
+	if err != nil {
+		return "", fmt.Errorf("error generating token")
+	}
+
+	return tokenJwtString, nil
+}
+
 func (s *AuthService) UserEmailExist(c context.Context, userEmail string) bool {
 	var user entities.User
 	tx := s.DB.WithContext(c).Begin()
@@ -54,12 +70,12 @@ func (s *AuthService) UserEmailExist(c context.Context, userEmail string) bool {
 	return true
 }
 
-func (s *AuthService) VerifyUser(c context.Context, inputUser web.VerifyUser) error {
+func (s *AuthService) VerifyUser(c context.Context, inputUser web.VerifyUser) (string, error) {
 
 	isEmailExist := s.UserEmailExist(c, inputUser.Email)
 
 	if !isEmailExist {
-		return fmt.Errorf("wrong credentials")
+		return "", fmt.Errorf("wrong credentials")
 	}
 
 	var user entities.User
@@ -71,16 +87,22 @@ func (s *AuthService) VerifyUser(c context.Context, inputUser web.VerifyUser) er
 	err := s.repository.FindByEmail(c, tx, inputUser.Email, &user)
 
 	if err != nil {
-		return fmt.Errorf("something went wrong")
+		return "", fmt.Errorf("something went wrong")
 	}
 
 	isPasswordCorrent := checkPassword(user.Password, inputUser.Password)
 
 	if !isPasswordCorrent {
-		return fmt.Errorf("wrong credentials")
+		return "", fmt.Errorf("wrong credentials")
 	}
 
-	return nil
+	jwtToken, err := s.GenerateJwtToken(int(user.ID))
+
+	if err != nil {
+		return "", err
+	}
+
+	return jwtToken, nil
 }
 
 func (s *AuthService) CreateNewUser(c context.Context, userData web.CreateUser) error {

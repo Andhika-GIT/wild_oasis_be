@@ -3,6 +3,7 @@ package web
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 )
 
 func ReadBodyRequest(request *http.Request, requestData interface{}) error {
@@ -22,4 +23,18 @@ func SendResponse(w http.ResponseWriter, statusCode int, response interface{}) {
 
 	encoder := json.NewEncoder(w)
 	encoder.Encode(response)
+}
+
+func SetCookie(w http.ResponseWriter, token string, isProd bool) {
+	cookie := http.Cookie{
+		Name:     "access_token",
+		Value:    token,
+		Path:     "/",
+		Expires:  time.Now().Add(24 * time.Hour),
+		HttpOnly: true,
+		Secure:   isProd,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	http.SetCookie(w, &cookie)
 }

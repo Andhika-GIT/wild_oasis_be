@@ -6,15 +6,18 @@ import (
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/services"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/web"
 	utils "github.com/Andhika-GIT/wild_oasis_be/pkg/web"
+	"github.com/spf13/viper"
 )
 
 type AuthHandler struct {
 	service *services.AuthService
+	env     *viper.Viper
 }
 
-func NewAuthHandler(service *services.AuthService) *AuthHandler {
+func NewAuthHandler(service *services.AuthService, viper *viper.Viper) *AuthHandler {
 	return &AuthHandler{
 		service: service,
+		env:     viper,
 	}
 }
 
@@ -31,7 +34,7 @@ func (c *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := c.service.VerifyUser(r.Context(), *bodyRequest)
+	jwtToken, err := c.service.VerifyUser(r.Context(), *bodyRequest)
 
 	if err != nil {
 		utils.SendResponse(w, http.StatusBadRequest, web.ErrorResponse{
@@ -41,10 +44,12 @@ func (c *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	utils.SetCookie(w, jwtToken, c.env.GetBool("IS_PRODUCTION"))
+
 	utils.SendResponse(w, http.StatusOK, web.Response{
 		Code:    http.StatusOK,
 		Message: "Successfully login",
-		Data:    "",
+		Data:    jwtToken,
 	})
 
 }

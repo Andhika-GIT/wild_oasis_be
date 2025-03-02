@@ -34,14 +34,14 @@ func Bootstrap() *AppConfig {
 	cabinService := services.NewCabinService(&cabinRepository, db, cloudinaryService)
 	settingService := services.NewSettingService(&settingRepository, db)
 	bookingService := services.NewBookingService(&bookingRepository, db)
-	authService := services.NewAuthService(&userRepository, db)
+	authService := services.NewAuthService(&userRepository, db, v)
 
 	// handlers
 	cabinHandler := handlers.NewCabinHandler(cabinService)
 	bookingHandler := handlers.NewBookingHandler(bookingService, cabinService)
 	settingHandler := handlers.NewSettingHandler(settingService)
 	cloudinaryHandler := handlers.NewCloudinaryHandler(cloudinaryService)
-	authHandler := handlers.NewAuthHandler(authService)
+	authHandler := handlers.NewAuthHandler(authService, v)
 
 	router := handlers.NewRouter(cabinHandler, bookingHandler, settingHandler, cloudinaryHandler, authHandler)
 
