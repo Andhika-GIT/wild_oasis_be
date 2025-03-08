@@ -78,26 +78,21 @@ func (c *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := c.service.CreateNewUser(r.Context(), *bodyRequest)
+	jwtToken, err := c.service.CreateNewUser(r.Context(), *bodyRequest)
 
 	if err != nil {
 		utils.SendResponse(w, http.StatusInternalServerError, web.ErrorResponse{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		})
-
 		return
 	}
+
+	utils.SetCookie(w, jwtToken, c.env.GetBool("IS_PRODUCTION"))
 
 	utils.SendResponse(w, http.StatusCreated, web.Response{
 		Code:    http.StatusOK,
 		Message: "Successfully created user",
-		Data:    "",
+		Data:    jwtToken,
 	})
 }
-
-// func (c *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
-// 	bodyRequest := &web.CreateUser{}
-
-// 	utils.ReadBodyRequest(r, bodyRequest)
-// }

@@ -105,7 +105,7 @@ func (s *AuthService) VerifyUser(c context.Context, inputUser web.VerifyUser) (s
 	return jwtToken, nil
 }
 
-func (s *AuthService) CreateNewUser(c context.Context, userData web.CreateUser) error {
+func (s *AuthService) CreateNewUser(c context.Context, userData web.CreateUser) (string, error) {
 
 	tx := s.DB.WithContext(c).Begin()
 
@@ -114,7 +114,7 @@ func (s *AuthService) CreateNewUser(c context.Context, userData web.CreateUser) 
 	hashedPassword, err := HashPassword(userData.Password)
 
 	if err != nil {
-		return fmt.Errorf("something went wrong")
+		return "", fmt.Errorf("something went wrong")
 	}
 
 	user := entities.User{
@@ -125,8 +125,14 @@ func (s *AuthService) CreateNewUser(c context.Context, userData web.CreateUser) 
 	err = s.repository.Create(c, tx, &user)
 
 	if err != nil {
-		return fmt.Errorf("error creating user : %v", err)
+		return "", fmt.Errorf("error creating user : %v", err)
 	}
 
-	return tx.Commit().Error
+	jwtToken, err := s.GenerateJwtToken(int(user.ID))
+
+	if err != nil {
+		return "", err
+	}
+
+	return jwtToken, tx.Commit().Error
 }
