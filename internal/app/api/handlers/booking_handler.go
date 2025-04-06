@@ -26,51 +26,48 @@ func (c *BookingHandler) GetBookedDatesByCabinId(w http.ResponseWriter, r *http.
 	cabinId := chi.URLParam(r, "cabinId")
 
 	if cabinId == "" {
-		utils.SendResponse(w, http.StatusBadRequest, web.ErrorResponse{
+		utils.SendResponse(w, http.StatusBadRequest, web.Response{
+			Success: false,
 			Code:    http.StatusBadRequest,
 			Message: "Cabin id is required",
 		})
-
 		return
 	}
 
 	id, err := strconv.Atoi(cabinId)
-
 	if err != nil {
-		utils.SendResponse(w, http.StatusInternalServerError, web.ErrorResponse{
+		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
+			Success: false,
 			Code:    http.StatusInternalServerError,
 			Message: "Something went wrong",
 		})
-
 		return
 	}
 
 	_, err = c.cabinService.FindById(r.Context(), id)
-
 	if err != nil {
-		utils.SendResponse(w, http.StatusNotFound, web.ErrorResponse{
+		utils.SendResponse(w, http.StatusNotFound, web.Response{
+			Success: false,
 			Code:    http.StatusNotFound,
 			Message: err.Error(),
 		})
-
 		return
 	}
 
 	bookingResponse, err := c.bookingService.GetBookedDatesByCabinId(r.Context(), id)
-
 	if err != nil {
-		utils.SendResponse(w, http.StatusNotFound, web.ErrorResponse{
+		utils.SendResponse(w, http.StatusNotFound, web.Response{
+			Success: false,
 			Code:    http.StatusNotFound,
 			Message: err.Error(),
 		})
-
 		return
 	}
 
 	utils.SendResponse(w, http.StatusOK, web.Response{
+		Success: true,
 		Code:    http.StatusOK,
-		Message: "Sucessfully find booking",
+		Message: "Successfully find booking",
 		Data:    bookingResponse,
 	})
-
 }

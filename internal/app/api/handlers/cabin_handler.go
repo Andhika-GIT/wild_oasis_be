@@ -25,16 +25,17 @@ func (c *CabinHandler) SeedsCabins(w http.ResponseWriter, r *http.Request) {
 	err := c.service.SeedCabins(r.Context())
 
 	if err != nil {
-		utils.SendResponse(w, 500, web.Response{
-			Code:    500,
+		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
+			Success: false,
+			Code:    http.StatusInternalServerError,
 			Message: fmt.Sprintf("error, %s", err),
 		})
-
 		return
 	}
 
-	utils.SendResponse(w, 200, web.Response{
-		Code:    200,
+	utils.SendResponse(w, http.StatusOK, web.Response{
+		Success: true,
+		Code:    http.StatusOK,
 		Message: "Successfully seeds cabins",
 	})
 }
@@ -52,7 +53,8 @@ func (c *CabinHandler) FindAllCabins(w http.ResponseWriter, r *http.Request) {
 
 		parsed, err := strconv.Atoi(maxCapacityParam)
 		if err != nil {
-			utils.SendResponse(w, http.StatusBadRequest, web.ErrorResponse{
+			utils.SendResponse(w, http.StatusBadRequest, web.Response{
+				Success: false,
 				Code:    http.StatusBadRequest,
 				Message: "Invalid max_capacity value",
 			})
@@ -67,7 +69,8 @@ func (c *CabinHandler) FindAllCabins(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 
-		utils.SendResponse(w, 500, web.ErrorResponse{
+		utils.SendResponse(w, 500, web.Response{
+			Success: false,
 			Code:    500,
 			Message: fmt.Sprintf("error, %s", err),
 		})
@@ -76,6 +79,7 @@ func (c *CabinHandler) FindAllCabins(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.SendResponse(w, 200, web.Response{
+		Success: true,
 		Code:    200,
 		Message: "Successfully get all cabins",
 		Data:    cabinResponse,
@@ -86,7 +90,8 @@ func (c *CabinHandler) FindCabinById(w http.ResponseWriter, r *http.Request) {
 	cabinId := chi.URLParam(r, "cabinId")
 
 	if cabinId == "" {
-		utils.SendResponse(w, 400, web.ErrorResponse{
+		utils.SendResponse(w, 400, web.Response{
+			Success: false,
 			Code:    400,
 			Message: "Cabin ID is required",
 		})
@@ -97,7 +102,8 @@ func (c *CabinHandler) FindCabinById(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(cabinId)
 
 	if err != nil {
-		utils.SendResponse(w, 500, web.ErrorResponse{
+		utils.SendResponse(w, 500, web.Response{
+			Success: false,
 			Code:    500,
 			Message: "Something went wrong",
 		})
@@ -108,7 +114,8 @@ func (c *CabinHandler) FindCabinById(w http.ResponseWriter, r *http.Request) {
 	cabinResponse, err := c.service.FindById(r.Context(), id)
 
 	if err != nil {
-		utils.SendResponse(w, 400, web.ErrorResponse{
+		utils.SendResponse(w, 400, web.Response{
+			Success: false,
 			Code:    404,
 			Message: fmt.Sprintf("error, %s", err),
 		})
@@ -117,6 +124,7 @@ func (c *CabinHandler) FindCabinById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.SendResponse(w, 200, web.Response{
+		Success: true,
 		Code:    200,
 		Message: "Sucessfully get cabin",
 		Data:    cabinResponse,
