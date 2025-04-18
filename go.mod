@@ -16,6 +16,7 @@ require (
 	github.com/creasty/defaults v1.7.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/gorilla/schema v1.4.1 // indirect
