@@ -2,6 +2,8 @@ package web
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -25,10 +27,10 @@ func SendResponse(w http.ResponseWriter, statusCode int, response interface{}) {
 	encoder.Encode(response)
 }
 
-func SetCookie(w http.ResponseWriter, token string, isProd bool) {
+func SetCookie(w http.ResponseWriter, name string, value string, isProd bool) {
 	cookie := http.Cookie{
 		Name:     "access_token",
-		Value:    token,
+		Value:    value,
 		Path:     "/",
 		Expires:  time.Now().Add(24 * time.Hour),
 		HttpOnly: true,
@@ -37,4 +39,19 @@ func SetCookie(w http.ResponseWriter, token string, isProd bool) {
 	}
 
 	http.SetCookie(w, &cookie)
+}
+
+func GetCookie(w http.ResponseWriter, r *http.Request, name string) (string, error) {
+	cookie, err := r.Cookie(name)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, http.ErrNoCookie):
+			return "", fmt.Errorf("cookie not found")
+		default:
+			return "", fmt.Errorf("server error")
+		}
+	}
+
+	return cookie.Value, nil
 }
