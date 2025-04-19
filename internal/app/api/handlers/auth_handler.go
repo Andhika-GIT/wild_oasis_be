@@ -44,7 +44,7 @@ func (c *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.SetCookie(w, jwtToken, c.env.GetBool("IS_PRODUCTION"))
+	utils.SetCookie(w, "access_token", jwtToken, c.env.GetBool("IS_PRODUCTION"))
 
 	utils.SendResponse(w, http.StatusOK, web.Response{
 		Success: true,
@@ -87,7 +87,7 @@ func (c *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.SetCookie(w, jwtToken, c.env.GetBool("IS_PRODUCTION"))
+	utils.SetCookie(w, "access_token", jwtToken, c.env.GetBool("IS_PRODUCTION"))
 
 	utils.SendResponse(w, http.StatusCreated, web.Response{
 		Success: true,
