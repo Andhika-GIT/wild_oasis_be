@@ -136,3 +136,23 @@ func (s *AuthService) CreateNewUser(c context.Context, userData web.CreateUser) 
 
 	return jwtToken, tx.Commit().Error
 }
+
+func (s *AuthService) FindCurrentUser(c context.Context, userID int) (web.UserResponse, error) {
+	var user entities.User
+	tx := s.DB.WithContext(c).Begin()
+
+	defer tx.Rollback()
+
+	err := s.repository.FindById(c, tx, userID, &user)
+
+	if err != nil {
+		return web.UserResponse{}, fmt.Errorf("user not found")
+	}
+
+	return web.UserResponse{
+		ID:      user.ID,
+		Email:   user.Email,
+		GuestID: user.GuestID,
+	}, nil
+
+}

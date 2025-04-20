@@ -6,6 +6,7 @@ import (
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/services"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/web"
 	utils "github.com/Andhika-GIT/wild_oasis_be/pkg/web"
+	"github.com/go-chi/jwtauth/v5"
 	"github.com/spf13/viper"
 )
 
@@ -94,5 +95,50 @@ func (c *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		Code:    http.StatusCreated,
 		Message: "Successfully created user",
 		Data:    jwtToken,
+	})
+}
+
+func (c *AuthHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
+	_, claims, err := jwtauth.FromContext(r.Context())
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusUnauthorized, web.Response{
+			Success: false,
+			Code:    http.StatusUnauthorized,
+			Message: "Unauthorized - No token",
+		})
+		return
+	}
+
+	userIDRaw := claims["user_id"]
+
+	userIDFloat, ok := userIDRaw.(float64)
+	if !ok {
+		utils.SendResponse(w, http.StatusUnauthorized, web.Response{
+			Success: false,
+			Code:    http.StatusUnauthorized,
+			Message: "Invalid token claims",
+		})
+		return
+	}
+
+	userID := int(userIDFloat)
+
+	userData, err := c.service.FindCurrentUser(r.Context(), userID)
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusNotFound, web.Response{
+			Success: false,
+			Code:    http.StatusNotFound,
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
+
+	utils.SendResponse(w, http.StatusCreated, web.Response{
+		Success: true,
+		Code:    http.StatusCreated,
+		Message: "Successfully get user",
+		Data:    userData,
 	})
 }
