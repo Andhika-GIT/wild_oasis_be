@@ -3,8 +3,10 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/Andhika-GIT/wild_oasis_be/internal/app/api/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/spf13/viper"
 )
 
 type Router struct {
@@ -14,9 +16,10 @@ type Router struct {
 	SettingHandler    *SettingHandler
 	CloudinaryHandler *CloudinaryHandler
 	AuthHandler       *AuthHandler
+	env               *viper.Viper
 }
 
-func NewRouter(cabinHandler *CabinHandler, bookingHandler *BookingHandler, settingHandler *SettingHandler, cloudinaryHandler *CloudinaryHandler, AuthHandler *AuthHandler) *Router {
+func NewRouter(cabinHandler *CabinHandler, bookingHandler *BookingHandler, settingHandler *SettingHandler, cloudinaryHandler *CloudinaryHandler, AuthHandler *AuthHandler, env *viper.Viper) *Router {
 
 	r := &Router{
 		route:             chi.NewMux(),
@@ -25,6 +28,7 @@ func NewRouter(cabinHandler *CabinHandler, bookingHandler *BookingHandler, setti
 		SettingHandler:    settingHandler,
 		CloudinaryHandler: cloudinaryHandler,
 		AuthHandler:       AuthHandler,
+		env:               env,
 	}
 
 	r.SetupRoute()
@@ -33,6 +37,8 @@ func NewRouter(cabinHandler *CabinHandler, bookingHandler *BookingHandler, setti
 }
 
 func (r *Router) SetupRoute() {
+
+	jwt_secret := r.env.GetString("JWT_SECRET")
 
 	r.route.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
@@ -68,6 +74,12 @@ func (r *Router) SetupRoute() {
 		// auth
 		api.Post("/auth/sign-in", r.AuthHandler.SignIn)
 		api.Post("/auth/sign-up", r.AuthHandler.SignUp)
+
+		api.Group(func(protected chi.Router) {
+
+			protected.Use(middleware.AuthMiddleware(jwt_secret))
+			protected.Get("/auth/me", r.AuthHandler.GetCurrentUser)
+		})
 
 	})
 

@@ -43,7 +43,7 @@ func Bootstrap() *AppConfig {
 	cloudinaryHandler := handlers.NewCloudinaryHandler(cloudinaryService)
 	authHandler := handlers.NewAuthHandler(authService, v)
 
-	router := handlers.NewRouter(cabinHandler, bookingHandler, settingHandler, cloudinaryHandler, authHandler)
+	router := handlers.NewRouter(cabinHandler, bookingHandler, settingHandler, cloudinaryHandler, authHandler, v)
 
 	return &AppConfig{
 		Router:            router.GetRouter(),
