@@ -21,7 +21,7 @@ func AuthMiddleware(jwtSecret string) func(http.Handler) http.Handler {
 				utils.SendResponse(w, http.StatusUnauthorized, web.Response{
 					Success: false,
 					Code:    http.StatusUnauthorized,
-					Message: "error get cookie",
+					Message: "Unauthorized",
 				})
 				return
 			}
@@ -31,7 +31,7 @@ func AuthMiddleware(jwtSecret string) func(http.Handler) http.Handler {
 				utils.SendResponse(w, http.StatusUnauthorized, web.Response{
 					Success: false,
 					Code:    http.StatusUnauthorized,
-					Message: "error verify token",
+					Message: "Unauthorized",
 				})
 				return
 			}
