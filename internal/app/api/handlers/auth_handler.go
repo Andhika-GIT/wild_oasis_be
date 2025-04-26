@@ -59,7 +59,7 @@ func (c *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	bodyRequest := &web.CreateUser{}
 	utils.ReadBodyRequest(r, bodyRequest)
 
-	if bodyRequest.Email == "" || bodyRequest.Password == "" {
+	if bodyRequest.Email == "" || bodyRequest.Password == "" || bodyRequest.Fullname == "" {
 		utils.SendResponse(w, http.StatusBadRequest, web.Response{
 			Success: false,
 			Code:    http.StatusBadRequest,
