@@ -47,7 +47,7 @@ func (r *Router) SetupRoute() {
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: false,
+		AllowCredentials: true,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
@@ -78,6 +78,7 @@ func (r *Router) SetupRoute() {
 		api.Group(func(protected chi.Router) {
 
 			protected.Use(middleware.AuthMiddleware(jwt_secret))
+			protected.Get("/auth/sign-out", r.AuthHandler.SignOut)
 			protected.Get("/auth/me", r.AuthHandler.GetCurrentUser)
 		})
 

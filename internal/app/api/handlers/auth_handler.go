@@ -51,7 +51,7 @@ func (c *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		Success: true,
 		Code:    http.StatusOK,
 		Message: "Successfully login",
-		Data:    jwtToken,
+		Data:    nil,
 	})
 }
 
@@ -94,8 +94,31 @@ func (c *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		Success: true,
 		Code:    http.StatusCreated,
 		Message: "Successfully created user",
-		Data:    jwtToken,
+		Data:    nil,
 	})
+}
+
+func (c *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
+	_, _, err := jwtauth.FromContext(r.Context())
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusUnauthorized, web.Response{
+			Success: false,
+			Code:    http.StatusUnauthorized,
+			Message: "Unauthorized - No token",
+		})
+		return
+	}
+
+	utils.ClearCookie(w, "access_token", c.env.GetBool("IS_PRODUCTION"))
+
+	utils.SendResponse(w, http.StatusCreated, web.Response{
+		Success: true,
+		Code:    http.StatusCreated,
+		Message: "Successfully sign out",
+		Data:    nil,
+	})
+
 }
 
 func (c *AuthHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
