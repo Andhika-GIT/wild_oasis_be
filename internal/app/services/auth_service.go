@@ -119,6 +119,7 @@ func (s *AuthService) CreateNewUser(c context.Context, userData web.CreateUser) 
 
 	user := entities.User{
 		Email:    userData.Email,
+		FullName: userData.Fullname,
 		Password: hashedPassword,
 	}
 
