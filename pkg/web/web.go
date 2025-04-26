@@ -29,10 +29,25 @@ func SendResponse(w http.ResponseWriter, statusCode int, response interface{}) {
 
 func SetCookie(w http.ResponseWriter, name string, value string, isProd bool) {
 	cookie := http.Cookie{
-		Name:     "access_token",
+		Name:     name,
 		Value:    value,
 		Path:     "/",
 		Expires:  time.Now().Add(24 * time.Hour),
+		HttpOnly: true,
+		Secure:   isProd,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	http.SetCookie(w, &cookie)
+}
+
+func ClearCookie(w http.ResponseWriter, name string, isProd bool) {
+	cookie := http.Cookie{
+		Name:     name,
+		Value:    "",
+		Path:     "/",
+		Expires:  time.Now().Add(-time.Hour),
+		MaxAge:   -1,
 		HttpOnly: true,
 		Secure:   isProd,
 		SameSite: http.SameSiteLaxMode,
