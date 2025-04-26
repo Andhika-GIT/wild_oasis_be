@@ -150,9 +150,8 @@ func (s *AuthService) FindCurrentUser(c context.Context, userID int) (web.UserRe
 	}
 
 	return web.UserResponse{
-		ID:      user.ID,
-		Email:   user.Email,
-		GuestID: user.GuestID,
+		ID:    user.ID,
+		Email: user.Email,
 	}, nil
 
 }

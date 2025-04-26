@@ -13,11 +13,11 @@ CREATE TABLE IF NOT EXISTS bookings (
     is_paid BOOL,
     observations VARCHAR(255),
     cabin_id INT,
-    guest_id INT,
+    user_id INT,
     CONSTRAINT fk_cabin
         FOREIGN KEY (cabin_id) REFERENCES cabins(id)
         ON DELETE CASCADE,
     CONSTRAINT fk_guest
-        FOREIGN KEY (guest_id) REFERENCES guests(id)
+        FOREIGN KEY (user_id) REFERENCES users(id)
         ON DELETE SET NULL
 );
