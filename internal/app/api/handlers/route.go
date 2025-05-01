@@ -80,6 +80,7 @@ func (r *Router) SetupRoute() {
 			protected.Use(middleware.AuthMiddleware(jwt_secret))
 			protected.Get("/auth/sign-out", r.AuthHandler.SignOut)
 			protected.Get("/auth/me", r.AuthHandler.GetCurrentUser)
+			protected.Put("/auth/update", r.AuthHandler.UpdateCurrentUser)
 		})
 
 	})

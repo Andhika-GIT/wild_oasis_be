@@ -22,6 +22,28 @@ func NewAuthHandler(service *services.AuthService, viper *viper.Viper) *AuthHand
 	}
 }
 
+func confirmToken(r *http.Request) (int, error) {
+	_, claims, err := jwtauth.FromContext(r.Context())
+
+	if err != nil {
+		// utils.SendResponse(w, http.StatusUnauthorized, web.Response{
+		// 	Success: false,
+		// 	Code:    http.StatusUnauthorized,
+		// 	Message: "Unauthorized - No token",
+		// })
+		return 0, err
+	}
+
+	userIDRaw := claims["user_id"]
+
+	userIDFloat, ok := userIDRaw.(float64)
+	if !ok {
+		return 0, err
+	}
+
+	return int(userIDFloat), nil
+}
+
 func (c *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	bodyRequest := &web.VerifyUser{}
 	utils.ReadBodyRequest(r, bodyRequest)
@@ -122,30 +144,16 @@ func (c *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *AuthHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
-	_, claims, err := jwtauth.FromContext(r.Context())
+
+	userID, err := confirmToken(r)
 
 	if err != nil {
 		utils.SendResponse(w, http.StatusUnauthorized, web.Response{
 			Success: false,
 			Code:    http.StatusUnauthorized,
-			Message: "Unauthorized - No token",
+			Message: err.Error(),
 		})
-		return
 	}
-
-	userIDRaw := claims["user_id"]
-
-	userIDFloat, ok := userIDRaw.(float64)
-	if !ok {
-		utils.SendResponse(w, http.StatusUnauthorized, web.Response{
-			Success: false,
-			Code:    http.StatusUnauthorized,
-			Message: "Invalid token claims",
-		})
-		return
-	}
-
-	userID := int(userIDFloat)
 
 	userData, err := c.service.FindCurrentUser(r.Context(), userID)
 
@@ -163,5 +171,38 @@ func (c *AuthHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 		Code:    http.StatusCreated,
 		Message: "Successfully get user",
 		Data:    userData,
+	})
+}
+
+func (c *AuthHandler) UpdateCurrentUser(w http.ResponseWriter, r *http.Request) {
+	bodyRequest := &web.UpdateUser{}
+	utils.ReadBodyRequest(r, bodyRequest)
+
+	userID, err := confirmToken(r)
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusUnauthorized, web.Response{
+			Success: false,
+			Code:    http.StatusUnauthorized,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	err = c.service.UpdateUser(r.Context(), userID, *bodyRequest)
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
+			Success: false,
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	utils.SendResponse(w, http.StatusOK, web.Response{
+		Success: true,
+		Code:    http.StatusOK,
+		Message: "Successfully update user",
 	})
 }

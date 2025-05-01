@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func ReadBodyRequest(request *http.Request, requestData interface{}) error {
+func ReadBodyRequest(request *http.Request, requestData any) error {
 	decoder := json.NewDecoder(request.Body)
 
 	err := decoder.Decode(requestData)
@@ -19,7 +19,7 @@ func ReadBodyRequest(request *http.Request, requestData interface{}) error {
 	return nil
 }
 
-func SendResponse(w http.ResponseWriter, statusCode int, response interface{}) {
+func SendResponse(w http.ResponseWriter, statusCode int, response any) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 

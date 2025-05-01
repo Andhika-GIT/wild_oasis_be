@@ -156,3 +156,18 @@ func (s *AuthService) FindCurrentUser(c context.Context, userID int) (web.UserRe
 	}, nil
 
 }
+
+func (s *AuthService) UpdateUser(c context.Context, userID int, userData web.UpdateUser) error {
+	var user entities.User
+	tx := s.DB.WithContext(c).Begin()
+
+	defer tx.Rollback()
+
+	err := s.repository.FindById(c, tx, userID, &user)
+
+	if err != nil {
+		return fmt.Errorf("user not found")
+	}
+
+	return nil
+}
