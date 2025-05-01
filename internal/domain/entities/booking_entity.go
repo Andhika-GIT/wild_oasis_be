@@ -17,12 +17,12 @@ type Booking struct {
 	IsPaid       bool      `json:"is_paid" gorm:"column:is_paid"`
 	Observations string    `json:"observations" gorm:"column:observations"`
 	CabinID      int       `json:"cabin_id" gorm:"column:cabin_id"`
-	GuestID      int       `json:"guest_id" gorm:"column:guest_id"`
+	UserID       int       `json:"user_id" gorm:"column:user_id"`
 
 	// Cabin Relation
 	Cabin Cabin `gorm:"foreignKey:CabinID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	// Guest Relation
-	Guest Guest `gorm:"foreignKey:GuestID;references:ID;constraint:OnUpdate:SET NULL,OnDelete:SET NULL"`
+	// User Relation
+	User User `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:SET NULL,OnDelete:SET NULL"`
 }
 
 func (a *Booking) TableName() string {

@@ -20,7 +20,7 @@ type BookingResponse struct {
 	IsPaid       bool      `gorm:"column:is_paid"`
 	Observations string    `gorm:"column:observations"`
 	CabinID      int       `gorm:"column:cabin_id"`
-	GuestID      int       `gorm:"column:guest_id"`
+	UserID       int       `gorm:"column:user_id"`
 }
 
 func ToBookingResponse(booking entities.Booking) BookingResponse {
@@ -38,7 +38,7 @@ func ToBookingResponse(booking entities.Booking) BookingResponse {
 		IsPaid:       booking.IsPaid,
 		Observations: booking.Observations,
 		CabinID:      booking.CabinID,
-		GuestID:      booking.GuestID,
+		UserID:       booking.UserID,
 	}
 }
 

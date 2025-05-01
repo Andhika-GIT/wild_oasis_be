@@ -3,7 +3,10 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/Andhika-GIT/wild_oasis_be/internal/app/api/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
+	"github.com/spf13/viper"
 )
 
 type Router struct {
@@ -12,9 +15,11 @@ type Router struct {
 	BookingHandler    *BookingHandler
 	SettingHandler    *SettingHandler
 	CloudinaryHandler *CloudinaryHandler
+	AuthHandler       *AuthHandler
+	env               *viper.Viper
 }
 
-func NewRouter(cabinHandler *CabinHandler, bookingHandler *BookingHandler, settingHandler *SettingHandler, cloudinaryHandler *CloudinaryHandler) *Router {
+func NewRouter(cabinHandler *CabinHandler, bookingHandler *BookingHandler, settingHandler *SettingHandler, cloudinaryHandler *CloudinaryHandler, AuthHandler *AuthHandler, env *viper.Viper) *Router {
 
 	r := &Router{
 		route:             chi.NewMux(),
@@ -22,6 +27,8 @@ func NewRouter(cabinHandler *CabinHandler, bookingHandler *BookingHandler, setti
 		BookingHandler:    bookingHandler,
 		SettingHandler:    settingHandler,
 		CloudinaryHandler: cloudinaryHandler,
+		AuthHandler:       AuthHandler,
+		env:               env,
 	}
 
 	r.SetupRoute()
@@ -30,6 +37,19 @@ func NewRouter(cabinHandler *CabinHandler, bookingHandler *BookingHandler, setti
 }
 
 func (r *Router) SetupRoute() {
+
+	jwt_secret := r.env.GetString("JWT_SECRET")
+
+	r.route.Use(cors.Handler(cors.Options{
+		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
+		AllowedOrigins: []string{"https://*", "http://*"},
+		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 
 	// Group routes under /api prefix
 	r.route.Route("/api", func(api chi.Router) {
@@ -50,6 +70,17 @@ func (r *Router) SetupRoute() {
 
 		// settings
 		api.Get("/setting", r.SettingHandler.GetSetting)
+
+		// auth
+		api.Post("/auth/sign-in", r.AuthHandler.SignIn)
+		api.Post("/auth/sign-up", r.AuthHandler.SignUp)
+
+		api.Group(func(protected chi.Router) {
+
+			protected.Use(middleware.AuthMiddleware(jwt_secret))
+			protected.Get("/auth/sign-out", r.AuthHandler.SignOut)
+			protected.Get("/auth/me", r.AuthHandler.GetCurrentUser)
+		})
 
 	})
 
