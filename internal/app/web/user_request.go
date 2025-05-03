@@ -1,6 +1,6 @@
 package web
 
-type UpdateUser struct {
-	NationalID  string `validate:"required" json:"nationalID"`
+type UpdateUserNationality struct {
+	NationalID  string `validate:"required" json:"national_id"`
 	Nationality string `validate:"required" json:"nationality"`
 }

@@ -174,9 +174,18 @@ func (c *AuthHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (c *AuthHandler) UpdateCurrentUser(w http.ResponseWriter, r *http.Request) {
-	bodyRequest := &web.UpdateUser{}
+func (c *AuthHandler) UpdateCurrentUserNationality(w http.ResponseWriter, r *http.Request) {
+	bodyRequest := &web.UpdateUserNationality{}
 	utils.ReadBodyRequest(r, bodyRequest)
+
+	if bodyRequest.NationalID == "" || bodyRequest.Nationality == "" {
+		utils.SendResponse(w, http.StatusBadRequest, web.Response{
+			Success: false,
+			Code:    http.StatusBadRequest,
+			Message: "All fields are required",
+		})
+		return
+	}
 
 	userID, err := confirmToken(r)
 
@@ -189,7 +198,7 @@ func (c *AuthHandler) UpdateCurrentUser(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err = c.service.UpdateUser(r.Context(), userID, *bodyRequest)
+	err = c.service.UpdateUserNationality(r.Context(), userID, *bodyRequest)
 
 	if err != nil {
 		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
