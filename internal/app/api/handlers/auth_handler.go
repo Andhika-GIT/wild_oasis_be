@@ -178,7 +178,7 @@ func (c *AuthHandler) UpdateCurrentUserNationality(w http.ResponseWriter, r *htt
 	bodyRequest := &web.UpdateUserNationality{}
 	utils.ReadBodyRequest(r, bodyRequest)
 
-	if bodyRequest.NationalID == "" || bodyRequest.Nationality == "" {
+	if bodyRequest.NationalID == "" || bodyRequest.Nationality == "" || bodyRequest.CountryFlag == "" {
 		utils.SendResponse(w, http.StatusBadRequest, web.Response{
 			Success: false,
 			Code:    http.StatusBadRequest,

@@ -23,6 +23,7 @@ func (r *UserRepository) Create(c context.Context, tx *gorm.DB, user *entities.U
 func (r *UserRepository) UpdateNationality(c context.Context, tx *gorm.DB, user *entities.User, updatedData *web.UpdateUserNationality) error {
 	user.NationalID = updatedData.NationalID
 	user.Nationality = updatedData.Nationality
+	user.CountryFlag = updatedData.CountryFlag
 
 	err := tx.Save(&user).Error
 
