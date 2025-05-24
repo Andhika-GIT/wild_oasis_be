@@ -22,28 +22,6 @@ func NewAuthHandler(service *services.AuthService, viper *viper.Viper) *AuthHand
 	}
 }
 
-func confirmToken(r *http.Request) (int, error) {
-	_, claims, err := jwtauth.FromContext(r.Context())
-
-	if err != nil {
-		// utils.SendResponse(w, http.StatusUnauthorized, web.Response{
-		// 	Success: false,
-		// 	Code:    http.StatusUnauthorized,
-		// 	Message: "Unauthorized - No token",
-		// })
-		return 0, err
-	}
-
-	userIDRaw := claims["user_id"]
-
-	userIDFloat, ok := userIDRaw.(float64)
-	if !ok {
-		return 0, err
-	}
-
-	return int(userIDFloat), nil
-}
-
 func (c *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	bodyRequest := &web.VerifyUser{}
 	utils.ReadBodyRequest(r, bodyRequest)
@@ -145,7 +123,7 @@ func (c *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 
 func (c *AuthHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 
-	userID, err := confirmToken(r)
+	userID, err := utils.GetUserIDFromToken(r)
 
 	if err != nil {
 		utils.SendResponse(w, http.StatusUnauthorized, web.Response{
@@ -187,7 +165,7 @@ func (c *AuthHandler) UpdateCurrentUserNationality(w http.ResponseWriter, r *htt
 		return
 	}
 
-	userID, err := confirmToken(r)
+	userID, err := utils.GetUserIDFromToken(r)
 
 	if err != nil {
 		utils.SendResponse(w, http.StatusUnauthorized, web.Response{

@@ -60,6 +60,21 @@ func (s *BookingService) GetBookedDatesByCabinId(c context.Context, cabinId int)
 
 }
 
+func (s *BookingService) FindCurrentUserBooking(c context.Context, userID int) ([]entities.Booking, error) {
+	var bookings []entities.Booking
+
+	tx := s.DB.WithContext(c)
+
+	err := s.repository.FindByUserId(c, tx, userID, &bookings)
+
+	if err != nil {
+		return bookings, fmt.Errorf("error when finding user booking %v", err)
+	}
+
+	return bookings, nil
+
+}
+
 func (s *BookingService) SeedBookings(c context.Context) error {
 
 	tx := s.DB.WithContext(c).Begin()

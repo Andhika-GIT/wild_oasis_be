@@ -81,6 +81,7 @@ func (r *Router) SetupRoute() {
 			protected.Get("/auth/sign-out", r.AuthHandler.SignOut)
 			protected.Get("/auth/me", r.AuthHandler.GetCurrentUser)
 			protected.Put("/auth/update-nationality", r.AuthHandler.UpdateCurrentUserNationality)
+			protected.Get("/booking/me", r.BookingHandler.GetCurrentUserBooking)
 		})
 
 	})

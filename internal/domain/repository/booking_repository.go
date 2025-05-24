@@ -40,3 +40,13 @@ func (r *BookingRepository) FindBookedDatesByCabinId(c context.Context, bookingD
 
 	return nil
 }
+
+func (r *BookingRepository) FindByUserId(c context.Context, tx *gorm.DB, userID int, bookings *[]entities.Booking) error {
+	err := tx.Where("user_id = ?", userID).Find(&bookings).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
