@@ -15,19 +15,19 @@ func main() {
 	err := app.CabinService.SeedCabins(context.Background())
 
 	if err != nil {
-		log.Fatalf("error while seeding : %v", err)
+		log.Fatalf("error while seeding cabins : %v", err)
 	}
 
 	err = app.BookingService.SeedBookings(context.Background())
 
 	if err != nil {
-		log.Fatal("error while seeding: %v", err)
+		log.Fatal("error while seeding bookings: %v", err)
 	}
 
 	err = app.SettingService.SeedSetting(context.Background())
 
 	if err != nil {
-		log.Fatal("error while seeding: %v", err)
+		log.Fatal("error while seeding settings: %v", err)
 	}
 
 	log.Println("Seeding completed")
