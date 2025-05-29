@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -102,5 +103,48 @@ func (c *BookingHandler) GetBookedDatesByCabinId(w http.ResponseWriter, r *http.
 		Code:    http.StatusOK,
 		Message: "Successfully find booking",
 		Data:    bookingResponse,
+	})
+}
+
+func (c *BookingHandler) DeleteCurrentUserBooking(w http.ResponseWriter, r *http.Request) {
+	paramsID := chi.URLParam(r, "bookingId")
+
+	if paramsID == "" {
+		utils.SendResponse(w, 400, web.Response{
+			Success: false,
+			Code:    400,
+			Message: "Cabin ID is required",
+		})
+
+		return
+	}
+
+	userID, err := utils.GetUserIDFromToken(r)
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusUnauthorized, web.Response{
+			Success: false,
+			Code:    http.StatusUnauthorized,
+			Message: "Unathorized",
+		})
+		return
+	}
+
+	bookingID, err := strconv.Atoi(paramsID)
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
+			Success: false,
+			Code:    http.StatusInternalServerError,
+			Message: fmt.Sprintf("something went wrong, %s", err.Error()),
+		})
+	}
+
+	errCode, errMessage, success := c.bookingService.DeleteCurrentUserBooking(r.Context(), userID, bookingID)
+
+	utils.SendResponse(w, errCode, web.Response{
+		Success: success,
+		Code:    errCode,
+		Message: errMessage,
 	})
 }

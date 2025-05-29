@@ -52,3 +52,23 @@ func (r *BookingRepository) FindByUserId(c context.Context, tx *gorm.DB, userID 
 
 	return nil
 }
+
+func (r *BookingRepository) FindById(c context.Context, tx *gorm.DB, bookingID int, booking *entities.Booking) error {
+	err := tx.Where("id = ?", bookingID).First(&booking).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *BookingRepository) Delete(c context.Context, tx *gorm.DB, booking *entities.Booking) error {
+	err := tx.Delete(&booking).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

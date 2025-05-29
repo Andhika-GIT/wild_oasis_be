@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/web"
@@ -72,6 +73,33 @@ func (s *BookingService) FindCurrentUserBooking(c context.Context, userID int) (
 	}
 
 	return bookings, nil
+
+}
+
+func (s *BookingService) DeleteCurrentUserBooking(c context.Context, userID int, bookingID int) (int, string, bool) {
+	var booking entities.Booking
+
+	tx := s.DB.WithContext(c)
+
+	_, err := s.FindCurrentUserBooking(c, userID)
+
+	if err != nil {
+		return http.StatusUnauthorized, fmt.Sprint("you are not allowed to run this action"), false
+	}
+
+	err = s.repository.FindById(c, tx, bookingID, &booking)
+
+	if err != nil {
+		return http.StatusNotFound, fmt.Sprint("booking not found"), false
+	}
+
+	err = s.repository.Delete(c, tx, &booking)
+
+	if err != nil {
+		return http.StatusInternalServerError, err.Error(), false
+	}
+
+	return http.StatusOK, "Sucessfully delete user booking", true
 
 }
 
