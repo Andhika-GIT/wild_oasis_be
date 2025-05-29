@@ -42,7 +42,9 @@ func (r *BookingRepository) FindBookedDatesByCabinId(c context.Context, bookingD
 }
 
 func (r *BookingRepository) FindByUserId(c context.Context, tx *gorm.DB, userID int, bookings *[]entities.Booking) error {
-	err := tx.Where("user_id = ?", userID).Find(&bookings).Error
+	err := tx.Preload("Cabin", func(db *gorm.DB) *gorm.DB {
+		return db.Select("id", "name", "image")
+	}).Where("user_id = ?", userID).Find(&bookings).Error
 
 	if err != nil {
 		return err

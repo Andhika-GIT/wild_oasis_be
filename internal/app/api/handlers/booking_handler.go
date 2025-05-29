@@ -47,9 +47,9 @@ func (c *BookingHandler) GetCurrentUserBooking(w http.ResponseWriter, r *http.Re
 
 	bookingData := web.ToBookingResponses(bookings)
 
-	utils.SendResponse(w, http.StatusNotFound, web.Response{
+	utils.SendResponse(w, http.StatusOK, web.Response{
 		Success: true,
-		Code:    200,
+		Code:    http.StatusOK,
 		Message: "Sucessfully found user booking",
 		Data:    bookingData,
 	})
