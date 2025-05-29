@@ -13,5 +13,20 @@
     "observations": "Guest requested early check-in.",
     "cabin_id": 1,
     "user_id": 1
+  },
+  {
+    "start_date": "2030-07-25T14:00:00Z",
+    "end_date": "2030-07-30T11:00:00Z",
+    "num_nights": 4,
+    "num_guests": 3,
+    "cabin_price": 100,
+    "extras_price": 20,
+    "total_price": 420,
+    "status": "confirmed",
+    "has_breakfast": true,
+    "is_paid": true,
+    "observations": "Guest requested next year check in.",
+    "cabin_id": 2,
+    "user_id": 1
   }
 ]
