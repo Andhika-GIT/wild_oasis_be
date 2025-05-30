@@ -82,7 +82,11 @@ func (r *Router) SetupRoute() {
 			protected.Get("/auth/me", r.AuthHandler.GetCurrentUser)
 			protected.Put("/auth/update-nationality", r.AuthHandler.UpdateCurrentUserNationality)
 			protected.Get("/booking/me", r.BookingHandler.GetCurrentUserBooking)
-			protected.Delete("/booking/delete/{bookingId}", r.BookingHandler.DeleteCurrentUserBooking)
+
+			protected.Group(func(protected_booking chi.Router) {
+				protected_booking.Use(middleware.UserBookingMiddleware(r.BookingHandler.BookingService))
+				protected_booking.Delete("/booking/delete/{bookingId}", r.BookingHandler.DeleteCurrentUserBooking)
+			})
 
 		})
 
