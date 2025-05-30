@@ -7,8 +7,9 @@ import (
 )
 
 type BookedCabin struct {
-	Name  string `json:"name"`
-	Image string `json:"image"`
+	Name        string `json:"name"`
+	Image       string `json:"image"`
+	MaxCapacity int    `json:"max_capacity"`
 }
 
 type BookingResponse struct {
@@ -30,8 +31,9 @@ type BookingResponse struct {
 
 func ToBookingResponse(booking entities.Booking) BookingResponse {
 	Cabin := &BookedCabin{
-		Name:  booking.Cabin.Name,
-		Image: booking.Cabin.Image,
+		Name:        booking.Cabin.Name,
+		Image:       booking.Cabin.Image,
+		MaxCapacity: booking.Cabin.MaxCapacity,
 	}
 
 	return BookingResponse{
