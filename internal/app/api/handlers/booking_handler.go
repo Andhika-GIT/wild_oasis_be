@@ -7,18 +7,19 @@ import (
 
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/services"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/web"
+	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/entities"
 	utils "github.com/Andhika-GIT/wild_oasis_be/pkg/web"
 	"github.com/go-chi/chi/v5"
 )
 
 type BookingHandler struct {
-	bookingService *services.BookingService
+	BookingService *services.BookingService
 	cabinService   *services.CabinService
 }
 
 func NewBookingHandler(bookingService *services.BookingService, cabinService *services.CabinService) *BookingHandler {
 	return &BookingHandler{
-		bookingService: bookingService,
+		BookingService: bookingService,
 		cabinService:   cabinService,
 	}
 }
@@ -35,7 +36,7 @@ func (c *BookingHandler) GetCurrentUserBooking(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	bookings, err := c.bookingService.FindCurrentUserBooking(r.Context(), userID)
+	bookings, err := c.BookingService.GetAllCurrentUserBooking(r.Context(), userID)
 
 	if err != nil {
 		utils.SendResponse(w, http.StatusNotFound, web.Response{
@@ -88,7 +89,7 @@ func (c *BookingHandler) GetBookedDatesByCabinId(w http.ResponseWriter, r *http.
 		return
 	}
 
-	bookingResponse, err := c.bookingService.GetBookedDatesByCabinId(r.Context(), id)
+	bookingResponse, err := c.BookingService.GetBookedDatesByCabinId(r.Context(), id)
 	if err != nil {
 		utils.SendResponse(w, http.StatusNotFound, web.Response{
 			Success: false,
@@ -107,30 +108,9 @@ func (c *BookingHandler) GetBookedDatesByCabinId(w http.ResponseWriter, r *http.
 }
 
 func (c *BookingHandler) DeleteCurrentUserBooking(w http.ResponseWriter, r *http.Request) {
-	paramsID := chi.URLParam(r, "bookingId")
+	booking := r.Context().Value("booking").(entities.Booking)
 
-	if paramsID == "" {
-		utils.SendResponse(w, 400, web.Response{
-			Success: false,
-			Code:    400,
-			Message: "Cabin ID is required",
-		})
-
-		return
-	}
-
-	userID, err := utils.GetUserIDFromToken(r)
-
-	if err != nil {
-		utils.SendResponse(w, http.StatusUnauthorized, web.Response{
-			Success: false,
-			Code:    http.StatusUnauthorized,
-			Message: "Unathorized",
-		})
-		return
-	}
-
-	bookingID, err := strconv.Atoi(paramsID)
+	err := c.BookingService.DeleteCurrentUserBooking(r.Context(), booking)
 
 	if err != nil {
 		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
@@ -138,13 +118,13 @@ func (c *BookingHandler) DeleteCurrentUserBooking(w http.ResponseWriter, r *http
 			Code:    http.StatusInternalServerError,
 			Message: fmt.Sprintf("something went wrong, %s", err.Error()),
 		})
+		return
+
 	}
 
-	errCode, errMessage, success := c.bookingService.DeleteCurrentUserBooking(r.Context(), userID, bookingID)
-
-	utils.SendResponse(w, errCode, web.Response{
-		Success: success,
-		Code:    errCode,
-		Message: errMessage,
+	utils.SendResponse(w, http.StatusOK, web.Response{
+		Success: true,
+		Code:    http.StatusOK,
+		Message: "Sucessfully delete booking",
 	})
 }

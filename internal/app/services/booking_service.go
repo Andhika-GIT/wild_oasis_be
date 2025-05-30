@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/web"
@@ -61,12 +60,26 @@ func (s *BookingService) GetBookedDatesByCabinId(c context.Context, cabinId int)
 
 }
 
-func (s *BookingService) FindCurrentUserBooking(c context.Context, userID int) ([]entities.Booking, error) {
+func (s *BookingService) CheckCurrentUserBooking(c context.Context, bookingID int, userID int) (entities.Booking, error) {
+	var booking entities.Booking
+
+	tx := s.DB.WithContext(c)
+
+	err := s.repository.FindByUserIdAndBookingId(c, tx, bookingID, userID, &booking)
+
+	if err != nil {
+		return booking, err
+	}
+
+	return booking, nil
+}
+
+func (s *BookingService) GetAllCurrentUserBooking(c context.Context, userID int) ([]entities.Booking, error) {
 	var bookings []entities.Booking
 
 	tx := s.DB.WithContext(c)
 
-	err := s.repository.FindByUserId(c, tx, userID, &bookings)
+	err := s.repository.FindAllByUserId(c, tx, userID, &bookings)
 
 	if err != nil {
 		return bookings, fmt.Errorf("error when finding user booking %v", err)
@@ -76,30 +89,17 @@ func (s *BookingService) FindCurrentUserBooking(c context.Context, userID int) (
 
 }
 
-func (s *BookingService) DeleteCurrentUserBooking(c context.Context, userID int, bookingID int) (int, string, bool) {
-	var booking entities.Booking
+func (s *BookingService) DeleteCurrentUserBooking(c context.Context, booking entities.Booking) error {
 
 	tx := s.DB.WithContext(c)
 
-	_, err := s.FindCurrentUserBooking(c, userID)
+	err := s.repository.Delete(c, tx, &booking)
 
 	if err != nil {
-		return http.StatusUnauthorized, fmt.Sprint("you are not allowed to run this action"), false
+		return err
 	}
 
-	err = s.repository.FindById(c, tx, bookingID, &booking)
-
-	if err != nil {
-		return http.StatusNotFound, fmt.Sprint("booking not found"), false
-	}
-
-	err = s.repository.Delete(c, tx, &booking)
-
-	if err != nil {
-		return http.StatusInternalServerError, err.Error(), false
-	}
-
-	return http.StatusOK, "Sucessfully delete user booking", true
+	return nil
 
 }
 

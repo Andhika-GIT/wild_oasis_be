@@ -41,7 +41,7 @@ func (r *BookingRepository) FindBookedDatesByCabinId(c context.Context, bookingD
 	return nil
 }
 
-func (r *BookingRepository) FindByUserId(c context.Context, tx *gorm.DB, userID int, bookings *[]entities.Booking) error {
+func (r *BookingRepository) FindAllByUserId(c context.Context, tx *gorm.DB, userID int, bookings *[]entities.Booking) error {
 	err := tx.Preload("Cabin", func(db *gorm.DB) *gorm.DB {
 		return db.Select("id", "name", "image")
 	}).Where("user_id = ?", userID).Find(&bookings).Error
@@ -55,6 +55,16 @@ func (r *BookingRepository) FindByUserId(c context.Context, tx *gorm.DB, userID 
 
 func (r *BookingRepository) FindById(c context.Context, tx *gorm.DB, bookingID int, booking *entities.Booking) error {
 	err := tx.Where("id = ?", bookingID).First(&booking).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *BookingRepository) FindByUserIdAndBookingId(c context.Context, tx *gorm.DB, bookingID int, userID int, booking *entities.Booking) error {
+	err := tx.Where("user_id = ? AND id = ?", userID, bookingID).First(&booking).Error
 
 	if err != nil {
 		return err
