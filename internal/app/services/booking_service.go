@@ -74,7 +74,21 @@ func (s *BookingService) CheckCurrentUserBooking(c context.Context, bookingID in
 	return booking, nil
 }
 
-func (s *BookingService) GetAllCurrentUserBooking(c context.Context, userID int) ([]entities.Booking, error) {
+func (s *BookingService) GetBookingById(c context.Context, bookingID int) (entities.Booking, error) {
+	var booking entities.Booking
+
+	tx := s.DB.WithContext(c)
+
+	err := s.repository.FindById(c, tx, bookingID, &booking)
+
+	if err != nil {
+		return booking, fmt.Errorf("booking not found")
+	}
+
+	return booking, nil
+}
+
+func (s *BookingService) GetAllCurrentUserBookings(c context.Context, userID int) ([]entities.Booking, error) {
 	var bookings []entities.Booking
 
 	tx := s.DB.WithContext(c)

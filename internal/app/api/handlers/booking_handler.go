@@ -24,7 +24,7 @@ func NewBookingHandler(bookingService *services.BookingService, cabinService *se
 	}
 }
 
-func (c *BookingHandler) GetCurrentUserBooking(w http.ResponseWriter, r *http.Request) {
+func (c *BookingHandler) GetAllUserBookings(w http.ResponseWriter, r *http.Request) {
 	userID, err := utils.GetUserIDFromToken(r)
 
 	if err != nil {
@@ -36,7 +36,7 @@ func (c *BookingHandler) GetCurrentUserBooking(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	bookings, err := c.BookingService.GetAllCurrentUserBooking(r.Context(), userID)
+	bookings, err := c.BookingService.GetAllCurrentUserBookings(r.Context(), userID)
 
 	if err != nil {
 		utils.SendResponse(w, http.StatusNotFound, web.Response{
@@ -53,6 +53,19 @@ func (c *BookingHandler) GetCurrentUserBooking(w http.ResponseWriter, r *http.Re
 		Success: true,
 		Code:    http.StatusOK,
 		Message: "Sucessfully found user booking",
+		Data:    bookingData,
+	})
+}
+
+func (c *BookingHandler) GetSpesificUserBooking(w http.ResponseWriter, r *http.Request) {
+	booking := r.Context().Value("booking").(entities.Booking)
+
+	bookingData := web.ToBookingResponse(booking)
+
+	utils.SendResponse(w, http.StatusOK, web.Response{
+		Success: true,
+		Code:    http.StatusOK,
+		Message: "Successfully find booking",
 		Data:    bookingData,
 	})
 }
@@ -74,7 +87,7 @@ func (c *BookingHandler) GetBookedDatesByCabinId(w http.ResponseWriter, r *http.
 		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
 			Success: false,
 			Code:    http.StatusInternalServerError,
-			Message: "Something went wrong",
+			Message: fmt.Sprintf("Something went wrong, %s", err.Error()),
 		})
 		return
 	}
@@ -84,7 +97,7 @@ func (c *BookingHandler) GetBookedDatesByCabinId(w http.ResponseWriter, r *http.
 		utils.SendResponse(w, http.StatusNotFound, web.Response{
 			Success: false,
 			Code:    http.StatusNotFound,
-			Message: err.Error(),
+			Message: "Cabin not found",
 		})
 		return
 	}

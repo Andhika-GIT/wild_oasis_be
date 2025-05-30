@@ -41,6 +41,17 @@ func UserBookingMiddleware(bookingService *services.BookingService) func(http.Ha
 
 			}
 
+			_, err = bookingService.GetBookingById(r.Context(), bookingID)
+
+			if err != nil {
+				utils.SendResponse(w, http.StatusNotFound, web.Response{
+					Success: false,
+					Code:    http.StatusNotFound,
+					Message: err.Error(),
+				})
+				return
+			}
+
 			booking, err := bookingService.CheckCurrentUserBooking(r.Context(), bookingID, userID)
 
 			if err != nil {
