@@ -87,6 +87,7 @@ func (r *Router) SetupRoute() {
 				protected_booking.Use(middleware.UserBookingMiddleware(r.BookingHandler.BookingService))
 				protected_booking.Get("/booking/me/{bookingId}", r.BookingHandler.GetSpesificUserBooking)
 				protected_booking.Delete("/booking/me/{bookingId}", r.BookingHandler.DeleteCurrentUserBooking)
+				protected_booking.Put("/booking/me/{bookingId}", r.BookingHandler.UpdateUserBooking)
 			})
 
 		})

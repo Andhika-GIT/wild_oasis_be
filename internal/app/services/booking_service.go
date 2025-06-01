@@ -105,7 +105,9 @@ func (s *BookingService) GetAllCurrentUserBookings(c context.Context, userID int
 
 func (s *BookingService) DeleteCurrentUserBooking(c context.Context, booking entities.Booking) error {
 
-	tx := s.DB.WithContext(c)
+	tx := s.DB.WithContext(c).Begin()
+
+	defer tx.Rollback()
 
 	err := s.repository.Delete(c, tx, &booking)
 
@@ -113,8 +115,22 @@ func (s *BookingService) DeleteCurrentUserBooking(c context.Context, booking ent
 		return err
 	}
 
-	return nil
+	return tx.Commit().Error
 
+}
+
+func (s *BookingService) UpdateCurrentUserReservation(c context.Context, booking *entities.Booking, updateData *web.EditReservation) error {
+	tx := s.DB.WithContext(c).Begin()
+
+	defer tx.Rollback()
+
+	err := s.repository.Update(c, tx, booking, updateData)
+
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit().Error
 }
 
 func (s *BookingService) SeedBookings(c context.Context) error {

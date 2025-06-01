@@ -141,3 +141,48 @@ func (c *BookingHandler) DeleteCurrentUserBooking(w http.ResponseWriter, r *http
 		Message: "Sucessfully delete booking",
 	})
 }
+
+func (c *BookingHandler) UpdateUserBooking(w http.ResponseWriter, r *http.Request) {
+	booking := r.Context().Value("booking").(entities.Booking)
+
+	bodyRequest := &web.EditReservation{}
+
+	err := utils.ReadBodyRequest(r, bodyRequest)
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
+			Success: false,
+			Code:    http.StatusInternalServerError,
+			Message: fmt.Sprintf("something went wrong, %s", err.Error()),
+		})
+		return
+
+	}
+
+	if bodyRequest.Observations == "" || bodyRequest.NumGuests == nil {
+		utils.SendResponse(w, http.StatusBadRequest, web.Response{
+			Success: false,
+			Code:    http.StatusBadRequest,
+			Message: "All fields are required",
+		})
+		return
+	}
+
+	err = c.BookingService.UpdateCurrentUserReservation(r.Context(), &booking, bodyRequest)
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
+			Success: false,
+			Code:    http.StatusInternalServerError,
+			Message: fmt.Sprintf("something went wrong, %s", err.Error()),
+		})
+		return
+
+	}
+
+	utils.SendResponse(w, http.StatusOK, web.Response{
+		Success: true,
+		Code:    http.StatusOK,
+		Message: "Successfully update reservation",
+	})
+}

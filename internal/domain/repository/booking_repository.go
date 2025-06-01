@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/Andhika-GIT/wild_oasis_be/internal/app/web"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/entities"
 	"gorm.io/gorm"
 )
@@ -67,6 +68,19 @@ func (r *BookingRepository) FindByUserIdAndBookingId(c context.Context, tx *gorm
 	err := tx.Preload("Cabin", func(db *gorm.DB) *gorm.DB {
 		return db.Select("id", "name", "image", "max_capacity")
 	}).Where("user_id = ? AND id = ?", userID, bookingID).First(&booking).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *BookingRepository) Update(c context.Context, tx *gorm.DB, booking *entities.Booking, data *web.EditReservation) error {
+	booking.NumGuests = *data.NumGuests
+	booking.Observations = data.Observations
+
+	err := tx.Save(&booking).Error
 
 	if err != nil {
 		return err
