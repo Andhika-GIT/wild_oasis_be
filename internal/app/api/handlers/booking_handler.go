@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/services"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/app/web"
 	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/entities"
+	"github.com/Andhika-GIT/wild_oasis_be/pkg/apperror"
 	utils "github.com/Andhika-GIT/wild_oasis_be/pkg/web"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/validator/v10"
 )
 
 type BookingHandler struct {
@@ -120,10 +123,11 @@ func (c *BookingHandler) GetBookedDatesByCabinId(w http.ResponseWriter, r *http.
 	})
 }
 
-func (c *BookingHandler) DeleteCurrentUserBooking(w http.ResponseWriter, r *http.Request) {
-	booking := r.Context().Value("booking").(entities.Booking)
+func (c *BookingHandler) CreateUserBooking(w http.ResponseWriter, r *http.Request) {
+	bodyRequest := &web.CreateBookingRequest{}
+	validate := validator.New()
 
-	err := c.BookingService.DeleteCurrentUserBooking(r.Context(), booking)
+	err := utils.ReadBodyRequest(r, bodyRequest)
 
 	if err != nil {
 		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
@@ -135,11 +139,40 @@ func (c *BookingHandler) DeleteCurrentUserBooking(w http.ResponseWriter, r *http
 
 	}
 
-	utils.SendResponse(w, http.StatusOK, web.Response{
-		Success: true,
-		Code:    http.StatusOK,
-		Message: "Sucessfully delete booking",
-	})
+	err = validate.Struct(bodyRequest)
+
+	if err != nil {
+		errorResponse := apperror.ExtractValidationError(err)
+		utils.SendResponse(w, http.StatusBadRequest, web.Response{
+			Success: false,
+			Code:    http.StatusBadRequest,
+			Message: strings.Join(errorResponse, ", "),
+		})
+		return
+	}
+
+	userID, err := utils.GetUserIDFromToken(r)
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
+			Success: false,
+			Code:    http.StatusInternalServerError,
+			Message: fmt.Sprintf("something went wrong, %s", err.Error()),
+		})
+		return
+	}
+
+	err = c.BookingService.CreateNewUserBooking(r.Context(), userID, bodyRequest)
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
+			Success: false,
+			Code:    http.StatusInternalServerError,
+			Message: fmt.Sprintf("something went wrong, %s", err.Error()),
+		})
+		return
+	}
+
 }
 
 func (c *BookingHandler) UpdateUserBooking(w http.ResponseWriter, r *http.Request) {
@@ -184,5 +217,27 @@ func (c *BookingHandler) UpdateUserBooking(w http.ResponseWriter, r *http.Reques
 		Success: true,
 		Code:    http.StatusOK,
 		Message: "Successfully update reservation",
+	})
+}
+
+func (c *BookingHandler) DeleteCurrentUserBooking(w http.ResponseWriter, r *http.Request) {
+	booking := r.Context().Value("booking").(entities.Booking)
+
+	err := c.BookingService.DeleteCurrentUserBooking(r.Context(), booking)
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
+			Success: false,
+			Code:    http.StatusInternalServerError,
+			Message: fmt.Sprintf("something went wrong, %s", err.Error()),
+		})
+		return
+
+	}
+
+	utils.SendResponse(w, http.StatusOK, web.Response{
+		Success: true,
+		Code:    http.StatusOK,
+		Message: "Sucessfully delete booking",
 	})
 }

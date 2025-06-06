@@ -82,6 +82,7 @@ func (r *Router) SetupRoute() {
 			protected.Get("/auth/me", r.AuthHandler.GetCurrentUser)
 			protected.Put("/auth/update-nationality", r.AuthHandler.UpdateCurrentUserNationality)
 			protected.Get("/booking/me", r.BookingHandler.GetAllUserBookings)
+			protected.Post("/booking/create", r.BookingHandler.CreateUserBooking)
 
 			protected.Group(func(protected_booking chi.Router) {
 				protected_booking.Use(middleware.UserBookingMiddleware(r.BookingHandler.BookingService))

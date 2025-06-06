@@ -103,6 +103,22 @@ func (s *BookingService) GetAllCurrentUserBookings(c context.Context, userID int
 
 }
 
+func (s *BookingService) CreateNewUserBooking(c context.Context, userID int, bookingData *web.CreateBookingRequest) error {
+	booking := web.ToBookingEntity(bookingData, userID)
+
+	tx := s.DB.WithContext(c).Begin()
+
+	defer tx.Rollback()
+
+	err := s.repository.Create(c, tx, booking)
+
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit().Error
+}
+
 func (s *BookingService) DeleteCurrentUserBooking(c context.Context, booking entities.Booking) error {
 
 	tx := s.DB.WithContext(c).Begin()
