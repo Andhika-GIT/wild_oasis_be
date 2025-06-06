@@ -1,6 +1,10 @@
 package web
 
-import "time"
+import (
+	"time"
+
+	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/entities"
+)
 
 type EditBooking struct {
 	NumGuests    *int   `json:"num_guests"`
@@ -8,30 +12,34 @@ type EditBooking struct {
 }
 
 type CreateBookingRequest struct {
-	StartDate    time.Time `json:"start_date"`
-	EndDate      time.Time `json:"end_date"`
-	NumNights    int       `json:"num_nights"`
-	NumGuests    int       `json:"num_guests"`
-	CabinPrice   float32   `json:"cabin_price"`
-	ExtrasPrice  float32   `json:"extras_price"`
-	TotalPrice   float32   `json:"total_price"`
-	Status       string    `json:"status"`
-	HasBreakfast bool      `json:"has_breakfast"`
-	IsPaid       bool      `json:"is_paid"`
-	Observations string    `json:"observations"`
+	StartDate    time.Time `json:"start_date" validate:"required"`
+	EndDate      time.Time `json:"end_date" validate:"required"`
+	NumNights    int       `json:"num_nights" validate:"required"`
+	NumGuests    int       `json:"num_guests" validate:"required"`
+	CabinPrice   float32   `json:"cabin_price" validate:"required"`
+	ExtrasPrice  float32   `json:"extras_price" validate:"required"`
+	TotalPrice   float32   `json:"total_price" validate:"required"`
+	Status       string    `json:"status" validate:"required"`
+	HasBreakfast bool      `json:"has_breakfast" validate:"required"` // boolean biasanya optional
+	IsPaid       bool      `json:"is_paid" validate:"required"`
+	Observations string    `json:"observations" validate:"required"`
+	CabinID      int       `json:"cabin_id" validate:"required"`
 }
 
-type CreateBooking struct {
-	StartDate    time.Time
-	EndDate      time.Time
-	NumNights    int
-	NumGuests    int
-	CabinPrice   float32
-	ExtrasPrice  float32
-	TotalPrice   float32
-	Status       string
-	HasBreakfast bool
-	IsPaid       bool
-	Observations string
-	UserID       int
+func ToBookingEntity(bookingData *CreateBookingRequest, userID int) *entities.Booking {
+	return &entities.Booking{
+		StartDate:    bookingData.StartDate,
+		EndDate:      bookingData.EndDate,
+		NumNights:    bookingData.NumNights,
+		NumGuests:    bookingData.NumGuests,
+		CabinPrice:   bookingData.CabinPrice,
+		ExtrasPrice:  bookingData.ExtrasPrice,
+		TotalPrice:   bookingData.TotalPrice,
+		Status:       bookingData.Status,
+		HasBreakfast: bookingData.HasBreakfast,
+		IsPaid:       bookingData.IsPaid,
+		Observations: bookingData.Observations,
+		CabinID:      bookingData.CabinID,
+		UserID:       userID,
+	}
 }
