@@ -145,7 +145,7 @@ func (c *BookingHandler) DeleteCurrentUserBooking(w http.ResponseWriter, r *http
 func (c *BookingHandler) UpdateUserBooking(w http.ResponseWriter, r *http.Request) {
 	booking := r.Context().Value("booking").(entities.Booking)
 
-	bodyRequest := &web.EditReservation{}
+	bodyRequest := &web.EditBooking{}
 
 	err := utils.ReadBodyRequest(r, bodyRequest)
 

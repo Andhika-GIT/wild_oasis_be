@@ -76,7 +76,7 @@ func (r *BookingRepository) FindByUserIdAndBookingId(c context.Context, tx *gorm
 	return nil
 }
 
-func (r *BookingRepository) Update(c context.Context, tx *gorm.DB, booking *entities.Booking, data *web.EditReservation) error {
+func (r *BookingRepository) Update(c context.Context, tx *gorm.DB, booking *entities.Booking, data *web.EditBooking) error {
 	booking.NumGuests = *data.NumGuests
 	booking.Observations = data.Observations
 

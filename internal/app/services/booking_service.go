@@ -119,7 +119,7 @@ func (s *BookingService) DeleteCurrentUserBooking(c context.Context, booking ent
 
 }
 
-func (s *BookingService) UpdateCurrentUserReservation(c context.Context, booking *entities.Booking, updateData *web.EditReservation) error {
+func (s *BookingService) UpdateCurrentUserReservation(c context.Context, booking *entities.Booking, updateData *web.EditBooking) error {
 	tx := s.DB.WithContext(c).Begin()
 
 	defer tx.Rollback()
