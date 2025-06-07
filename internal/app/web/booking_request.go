@@ -16,12 +16,12 @@ type CreateBookingRequest struct {
 	EndDate      time.Time `json:"end_date" validate:"required"`
 	NumNights    int       `json:"num_nights" validate:"required"`
 	NumGuests    int       `json:"num_guests" validate:"required"`
-	CabinPrice   float32   `json:"cabin_price" validate:"required"`
-	ExtrasPrice  float32   `json:"extras_price" validate:"required"`
-	TotalPrice   float32   `json:"total_price" validate:"required"`
+	CabinPrice   float32   `json:"cabin_price" validate:"gte=0"`
+	ExtrasPrice  float32   `json:"extras_price" validate:"gte=0"`
+	TotalPrice   float32   `json:"total_price" validate:"gte=0"`
 	Status       string    `json:"status" validate:"required"`
-	HasBreakfast bool      `json:"has_breakfast" validate:"required"` // boolean biasanya optional
-	IsPaid       bool      `json:"is_paid" validate:"required"`
+	HasBreakfast bool      `json:"has_breakfast" ` // boolean biasanya optional
+	IsPaid       bool      `json:"is_paid"`
 	Observations string    `json:"observations" validate:"required"`
 	CabinID      int       `json:"cabin_id" validate:"required"`
 }

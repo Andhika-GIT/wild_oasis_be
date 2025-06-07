@@ -173,6 +173,12 @@ func (c *BookingHandler) CreateUserBooking(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	utils.SendResponse(w, http.StatusOK, web.Response{
+		Success: true,
+		Code:    http.StatusOK,
+		Message: "Successfully create reservation",
+	})
+
 }
 
 func (c *BookingHandler) UpdateUserBooking(w http.ResponseWriter, r *http.Request) {
