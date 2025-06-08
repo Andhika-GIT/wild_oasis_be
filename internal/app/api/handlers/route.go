@@ -80,6 +80,17 @@ func (r *Router) SetupRoute() {
 			protected.Use(middleware.AuthMiddleware(jwt_secret))
 			protected.Get("/auth/sign-out", r.AuthHandler.SignOut)
 			protected.Get("/auth/me", r.AuthHandler.GetCurrentUser)
+			protected.Put("/auth/update-nationality", r.AuthHandler.UpdateCurrentUserNationality)
+			protected.Get("/booking/me", r.BookingHandler.GetAllUserBookings)
+			protected.Post("/booking/create", r.BookingHandler.CreateUserBooking)
+
+			protected.Group(func(protected_booking chi.Router) {
+				protected_booking.Use(middleware.UserBookingMiddleware(r.BookingHandler.BookingService))
+				protected_booking.Get("/booking/me/{bookingId}", r.BookingHandler.GetSpesificUserBooking)
+				protected_booking.Delete("/booking/me/{bookingId}", r.BookingHandler.DeleteCurrentUserBooking)
+				protected_booking.Put("/booking/me/{bookingId}", r.BookingHandler.UpdateUserBooking)
+			})
+
 		})
 
 	})

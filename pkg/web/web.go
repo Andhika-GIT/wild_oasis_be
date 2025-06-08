@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/go-chi/jwtauth/v5"
 )
 
-func ReadBodyRequest(request *http.Request, requestData interface{}) error {
+func ReadBodyRequest(request *http.Request, requestData any) error {
 	decoder := json.NewDecoder(request.Body)
 
 	err := decoder.Decode(requestData)
@@ -19,7 +21,7 @@ func ReadBodyRequest(request *http.Request, requestData interface{}) error {
 	return nil
 }
 
-func SendResponse(w http.ResponseWriter, statusCode int, response interface{}) {
+func SendResponse(w http.ResponseWriter, statusCode int, response any) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 
@@ -69,4 +71,21 @@ func GetCookie(w http.ResponseWriter, r *http.Request, name string) (string, err
 	}
 
 	return cookie.Value, nil
+}
+
+func GetUserIDFromToken(r *http.Request) (int, error) {
+	_, claims, err := jwtauth.FromContext(r.Context())
+
+	if err != nil {
+		return 0, err
+	}
+
+	userIDRaw := claims["user_id"]
+
+	userIDFloat, ok := userIDRaw.(float64)
+	if !ok {
+		return 0, err
+	}
+
+	return int(userIDFloat), nil
 }

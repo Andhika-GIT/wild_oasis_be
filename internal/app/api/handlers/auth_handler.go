@@ -122,30 +122,16 @@ func (c *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *AuthHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
-	_, claims, err := jwtauth.FromContext(r.Context())
+
+	userID, err := utils.GetUserIDFromToken(r)
 
 	if err != nil {
 		utils.SendResponse(w, http.StatusUnauthorized, web.Response{
 			Success: false,
 			Code:    http.StatusUnauthorized,
-			Message: "Unauthorized - No token",
+			Message: err.Error(),
 		})
-		return
 	}
-
-	userIDRaw := claims["user_id"]
-
-	userIDFloat, ok := userIDRaw.(float64)
-	if !ok {
-		utils.SendResponse(w, http.StatusUnauthorized, web.Response{
-			Success: false,
-			Code:    http.StatusUnauthorized,
-			Message: "Invalid token claims",
-		})
-		return
-	}
-
-	userID := int(userIDFloat)
 
 	userData, err := c.service.FindCurrentUser(r.Context(), userID)
 
@@ -163,5 +149,47 @@ func (c *AuthHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 		Code:    http.StatusCreated,
 		Message: "Successfully get user",
 		Data:    userData,
+	})
+}
+
+func (c *AuthHandler) UpdateCurrentUserNationality(w http.ResponseWriter, r *http.Request) {
+	bodyRequest := &web.UpdateUserNationality{}
+	utils.ReadBodyRequest(r, bodyRequest)
+
+	if bodyRequest.NationalID == "" || bodyRequest.Nationality == "" || bodyRequest.CountryFlag == "" {
+		utils.SendResponse(w, http.StatusBadRequest, web.Response{
+			Success: false,
+			Code:    http.StatusBadRequest,
+			Message: "All fields are required",
+		})
+		return
+	}
+
+	userID, err := utils.GetUserIDFromToken(r)
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusUnauthorized, web.Response{
+			Success: false,
+			Code:    http.StatusUnauthorized,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	err = c.service.UpdateUserNationality(r.Context(), userID, *bodyRequest)
+
+	if err != nil {
+		utils.SendResponse(w, http.StatusInternalServerError, web.Response{
+			Success: false,
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	utils.SendResponse(w, http.StatusOK, web.Response{
+		Success: true,
+		Code:    http.StatusOK,
+		Message: "Successfully update user",
 	})
 }

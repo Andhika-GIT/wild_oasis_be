@@ -60,6 +60,95 @@ func (s *BookingService) GetBookedDatesByCabinId(c context.Context, cabinId int)
 
 }
 
+func (s *BookingService) CheckCurrentUserBooking(c context.Context, bookingID int, userID int) (entities.Booking, error) {
+	var booking entities.Booking
+
+	tx := s.DB.WithContext(c)
+
+	err := s.repository.FindByUserIdAndBookingId(c, tx, bookingID, userID, &booking)
+
+	if err != nil {
+		return booking, err
+	}
+
+	return booking, nil
+}
+
+func (s *BookingService) GetBookingById(c context.Context, bookingID int) (entities.Booking, error) {
+	var booking entities.Booking
+
+	tx := s.DB.WithContext(c)
+
+	err := s.repository.FindById(c, tx, bookingID, &booking)
+
+	if err != nil {
+		return booking, fmt.Errorf("booking not found")
+	}
+
+	return booking, nil
+}
+
+func (s *BookingService) GetAllCurrentUserBookings(c context.Context, userID int) ([]entities.Booking, error) {
+	var bookings []entities.Booking
+
+	tx := s.DB.WithContext(c)
+
+	err := s.repository.FindAllByUserId(c, tx, userID, &bookings)
+
+	if err != nil {
+		return bookings, fmt.Errorf("error when finding user booking %v", err)
+	}
+
+	return bookings, nil
+
+}
+
+func (s *BookingService) CreateNewUserBooking(c context.Context, userID int, bookingData *web.CreateBookingRequest) error {
+	booking := web.ToBookingEntity(bookingData, userID)
+
+	tx := s.DB.WithContext(c).Begin()
+
+	defer tx.Rollback()
+
+	err := s.repository.Create(c, tx, booking)
+
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit().Error
+}
+
+func (s *BookingService) DeleteCurrentUserBooking(c context.Context, booking entities.Booking) error {
+
+	tx := s.DB.WithContext(c).Begin()
+
+	defer tx.Rollback()
+
+	err := s.repository.Delete(c, tx, &booking)
+
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit().Error
+
+}
+
+func (s *BookingService) UpdateCurrentUserReservation(c context.Context, booking *entities.Booking, updateData *web.EditBooking) error {
+	tx := s.DB.WithContext(c).Begin()
+
+	defer tx.Rollback()
+
+	err := s.repository.Update(c, tx, booking, updateData)
+
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit().Error
+}
+
 func (s *BookingService) SeedBookings(c context.Context) error {
 
 	tx := s.DB.WithContext(c).Begin()

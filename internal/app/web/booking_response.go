@@ -6,24 +6,36 @@ import (
 	"github.com/Andhika-GIT/wild_oasis_be/internal/domain/entities"
 )
 
+type BookedCabin struct {
+	Name        string `json:"name"`
+	Image       string `json:"image"`
+	MaxCapacity int    `json:"max_capacity"`
+}
+
 type BookingResponse struct {
-	ID           int64     `gorm:"column:id;primaryKey"`
-	StartDate    time.Time `gorm:"column:start_date"`
-	EndDate      time.Time `gorm:"column:end_date"`
-	NumNights    int       `gorm:"column:num_nights"`
-	NumGuests    int       `gorm:"column:num_guests"`
-	CabinPrice   float32   `gorm:"column:cabin_price"`
-	ExtrasPrice  float32   `gorm:"column:extras_price"`
-	TotalPrice   float32   `gorm:"column:total_price"`
-	Status       string    `gorm:"column:status"`
-	HasBreakfast bool      `gorm:"column:has_breakfast"`
-	IsPaid       bool      `gorm:"column:is_paid"`
-	Observations string    `gorm:"column:observations"`
-	CabinID      int       `gorm:"column:cabin_id"`
-	UserID       int       `gorm:"column:user_id"`
+	ID           int64       `json:"id"`
+	StartDate    time.Time   `json:"start_date"`
+	EndDate      time.Time   `json:"end_date"`
+	NumNights    int         `json:"num_nights"`
+	NumGuests    int         `json:"num_guests"`
+	CabinPrice   float32     `json:"cabin_price"`
+	ExtrasPrice  float32     `json:"extras_price"`
+	TotalPrice   float32     `json:"total_price"`
+	Status       string      `json:"status"`
+	HasBreakfast bool        `json:"has_breakfast"`
+	IsPaid       bool        `json:"is_paid"`
+	Observations string      `json:"observations"`
+	CreatedAt    time.Time   `json:"created_at"`
+	Cabin        BookedCabin `json:"cabin"`
 }
 
 func ToBookingResponse(booking entities.Booking) BookingResponse {
+	Cabin := &BookedCabin{
+		Name:        booking.Cabin.Name,
+		Image:       booking.Cabin.Image,
+		MaxCapacity: booking.Cabin.MaxCapacity,
+	}
+
 	return BookingResponse{
 		ID:           booking.ID,
 		StartDate:    booking.StartDate,
@@ -37,8 +49,8 @@ func ToBookingResponse(booking entities.Booking) BookingResponse {
 		HasBreakfast: booking.HasBreakfast,
 		IsPaid:       booking.IsPaid,
 		Observations: booking.Observations,
-		CabinID:      booking.CabinID,
-		UserID:       booking.UserID,
+		CreatedAt:    booking.CreatedAt,
+		Cabin:        *Cabin,
 	}
 }
 

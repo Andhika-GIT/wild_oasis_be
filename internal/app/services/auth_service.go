@@ -102,7 +102,7 @@ func (s *AuthService) VerifyUser(c context.Context, inputUser web.VerifyUser) (s
 		return "", err
 	}
 
-	return jwtToken, nil
+	return jwtToken, tx.Commit().Error
 }
 
 func (s *AuthService) CreateNewUser(c context.Context, userData web.CreateUser) (string, error) {
@@ -151,8 +151,32 @@ func (s *AuthService) FindCurrentUser(c context.Context, userID int) (web.UserRe
 	}
 
 	return web.UserResponse{
-		ID:    user.ID,
-		Email: user.Email,
-	}, nil
+		ID:          user.ID,
+		FullName:    user.FullName,
+		Email:       user.Email,
+		NationalID:  user.NationalID,
+		Nationality: user.Nationality,
+	}, tx.Commit().Error
 
+}
+
+func (s *AuthService) UpdateUserNationality(c context.Context, userID int, userData web.UpdateUserNationality) error {
+	var user entities.User
+	tx := s.DB.WithContext(c).Begin()
+
+	defer tx.Rollback()
+
+	err := s.repository.FindById(c, tx, userID, &user)
+
+	if err != nil {
+		return fmt.Errorf("user not found")
+	}
+
+	err = s.repository.UpdateNationality(c, tx, &user, &userData)
+
+	if err != nil {
+		return fmt.Errorf("error updating user: %v", err.Error())
+	}
+
+	return tx.Commit().Error
 }
